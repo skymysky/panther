@@ -33,6 +33,7 @@ const HealthCheckPanel: React.FC = () => {
   const { initialValues, resetForm } = useFormikContext<S3LogSourceWizardValues>();
 
   const { data, loading, refetch } = useGetS3LogSource({
+    notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only', // Don't use cache
     variables: { id: integrationId },
   });
