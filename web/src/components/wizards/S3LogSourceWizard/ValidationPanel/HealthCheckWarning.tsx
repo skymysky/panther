@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { Box, Flex, Text, Img } from 'pouncejs';
-import FilledWarning from 'Assets/icons/icon-filled-white.svg';
+import WarningIcon from 'Assets/icons/warning.svg';
 
 interface WarningProps {
   title: string;
@@ -27,7 +27,7 @@ interface WarningProps {
 const HealthCheckWarning: React.FC<WarningProps> = ({ title, description }) => {
   return (
     <Flex spacing={4} backgroundColor="navyblue-500" p={4}>
-      <Img src={FilledWarning} alt="Warning" nativeWidth={24} nativeHeight={24} />
+      <Img src={WarningIcon} alt="Warning" nativeWidth={24} nativeHeight={24} />
       <Box>
         <Text fontSize="medium" pb={2}>
           {title}

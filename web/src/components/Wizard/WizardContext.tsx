@@ -29,7 +29,9 @@ interface WizardContextValue<WizardData> {
   reset: () => void;
   data: WizardData;
   currentStepStatus: StepStatus;
+  integrationId: string;
   setCurrentStepStatus: (stepStatus: StepStatus) => void;
+  setIntegrationId: (integrationId: string) => void;
 }
 
 export const WizardContext = React.createContext(null);

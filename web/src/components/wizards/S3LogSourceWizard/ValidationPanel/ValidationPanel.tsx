@@ -29,8 +29,8 @@ import { LOG_ONBOARDING_SNS_DOC_URL } from 'Source/constants';
 import { AddS3LogSource } from 'Pages/CreateLogSource/CreateS3LogSource/graphql/addS3LogSource.generated';
 import { UpdateS3LogSource } from 'Pages/EditS3LogSource/graphql/updateS3LogSource.generated';
 import { S3LogIntegrationDetails } from 'Source/graphql/fragments/S3LogIntegrationDetails.generated';
-import SuccessContent from 'Components/wizards/S3LogSourceWizard/ValidationPanel/SuccessContent';
 import { S3LogSourceWizardValues } from '../S3LogSourceWizard';
+import HealthCheckPanel from './HealthCheckPanel';
 
 type SubmitResult = {
   data: AddS3LogSource & UpdateS3LogSource;
@@ -48,15 +48,18 @@ function getResponseData(result: SubmitResult): S3LogIntegrationDetails {
 
 const ValidationPanel: React.FC = () => {
   const [errorMessage, setErrorMessage] = React.useState('');
-  const { reset: resetWizard, currentStepStatus, setCurrentStepStatus } = useWizardContext();
-  const { initialValues, submitForm } = useFormikContext<S3LogSourceWizardValues>();
+  const {
+    reset: resetWizard,
+    currentStepStatus,
+    setCurrentStepStatus,
+    setIntegrationId,
+  } = useWizardContext();
+  const { submitForm } = useFormikContext<S3LogSourceWizardValues>();
   const [shouldShowNotificationsScreen, setNotificationScreenVisibility] = React.useState(true);
 
   const [showManagedNotificationsWarning, setShowManagedNotificationsWarning] = React.useState(
     false
   );
-
-  const [integrationId, setIntegrationId] = React.useState(initialValues.integrationId);
 
   React.useEffect(() => {
     (async () => {
@@ -170,7 +173,7 @@ const ValidationPanel: React.FC = () => {
     );
   }
 
-  return <SuccessContent integrationId={integrationId} />;
+  return <HealthCheckPanel />;
 };
 
 export default ValidationPanel;

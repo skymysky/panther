@@ -25,27 +25,19 @@ import React from 'react';
 import { Link as RRLink } from 'react-router-dom';
 import { useFormikContext } from 'formik';
 import { S3LogSourceWizardValues } from 'Components/wizards/S3LogSourceWizard/S3LogSourceWizard';
-import { useGetS3LogSourceLazyQuery } from 'Pages/EditS3LogSource/graphql/getS3LogSource.generated';
+import { useGetS3LogSource } from 'Pages/EditS3LogSource/graphql/getS3LogSource.generated';
 import HealthCheckWarning from './HealthCheckWarning';
 
-interface SuccessContentProps {
-  integrationId: string;
-}
-
-const SuccessContent: React.FC<SuccessContentProps> = ({ integrationId }) => {
-  const { reset: resetWizard } = useWizardContext();
+const HealthCheckPanel: React.FC = () => {
+  const { reset: resetWizard, integrationId } = useWizardContext();
   const { initialValues, resetForm } = useFormikContext<S3LogSourceWizardValues>();
 
-  const [getS3, { data, loading }] = useGetS3LogSourceLazyQuery({
+  const { data, loading, refetch } = useGetS3LogSource({
     fetchPolicy: 'network-only', // Don't use cache
     variables: { id: integrationId },
   });
 
-  React.useEffect(() => {
-    getS3();
-  }, []);
-
-  if (loading || !data) {
+  if (loading) {
     return (
       <Flex align="center" justify="center" height={380}>
         <Spinner />
@@ -71,7 +63,7 @@ const SuccessContent: React.FC<SuccessContentProps> = ({ integrationId }) => {
       <WizardPanel>
         <Flex align="center" direction="column" mx="auto" width={675}>
           <WizardPanel.Heading
-            title="The source is saved, but there are some issues blocking log integration"
+            title="The source is saved, but there are some issues blocking log ingestion"
             subtitle="Have a look at the error(s) below and try again. If the problem continues, contact us."
           />
           <SimpleGrid column={1} spacing={2}>
@@ -89,7 +81,7 @@ const SuccessContent: React.FC<SuccessContentProps> = ({ integrationId }) => {
           </SimpleGrid>
           <WizardPanel.Actions>
             <Flex direction="column" align="center" spacing={4}>
-              <Button onClick={() => getS3()}>Retry Healthcheck</Button>
+              <Button onClick={() => refetch()}>Retry Healthcheck</Button>
               {!initialValues.integrationId && (
                 <Link
                   as={RRLink}
@@ -144,4 +136,4 @@ const SuccessContent: React.FC<SuccessContentProps> = ({ integrationId }) => {
   );
 };
 
-export default React.memo(SuccessContent);
+export default React.memo(HealthCheckPanel);
