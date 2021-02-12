@@ -1,5 +1,23 @@
+/**
+ * Panther is a Cloud-Native SIEM for the Modern Security Team.
+ * Copyright (C) 2020 Panther Labs Inc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { useWizardContext, WizardPanel } from 'Components/Wizard';
-import { AbstractButton, Alert, Button, Flex, Img, Link, SimpleGrid, Spinner } from 'pouncejs';
+import { AbstractButton, Button, Flex, Img, Link, SimpleGrid, Spinner } from 'pouncejs';
 import SuccessStatus from 'Assets/statuses/success.svg';
 import LinkButton from 'Components/buttons/LinkButton';
 import urls from 'Source/urls';
@@ -8,6 +26,7 @@ import { Link as RRLink } from 'react-router-dom';
 import { useFormikContext } from 'formik';
 import { S3LogSourceWizardValues } from 'Components/wizards/S3LogSourceWizard/S3LogSourceWizard';
 import { useGetS3LogSourceLazyQuery } from 'Pages/EditS3LogSource/graphql/getS3LogSource.generated';
+import HealthCheckWarning from './HealthCheckWarning';
 
 interface SuccessContentProps {
   integrationId: string;
@@ -60,9 +79,8 @@ const SuccessContent: React.FC<SuccessContentProps> = ({ integrationId }) => {
               .filter(hc => !hc.healthy)
               .map(hc => {
                 return hc.message?.length || hc.rawErrorMessage ? (
-                  <Alert
+                  <HealthCheckWarning
                     key={hc.message}
-                    variant="error"
                     title={hc.message}
                     description={hc.rawErrorMessage}
                   />
