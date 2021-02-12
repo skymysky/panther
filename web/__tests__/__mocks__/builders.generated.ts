@@ -48,10 +48,9 @@ import {
   DeleteCustomLogInput,
   DeleteCustomLogOutput,
   DeleteDataModelInput,
+  DeleteDetectionInput,
   DeleteEntry,
   DeleteGlobalPythonModuleInput,
-  DeletePolicyInput,
-  DeleteRuleInput,
   DeliverAlertInput,
   DeliveryResponse,
   Destination,
@@ -302,6 +301,8 @@ export const buildAddS3LogIntegrationInput = (
     kmsKey: 'kmsKey' in overrides ? overrides.kmsKey : 'Personal Loan Account',
     s3PrefixLogTypes:
       's3PrefixLogTypes' in overrides ? overrides.s3PrefixLogTypes : [buildS3PrefixLogTypesInput()],
+    managedBucketNotifications:
+      'managedBucketNotifications' in overrides ? overrides.managedBucketNotifications : false,
   };
 };
 
@@ -611,6 +612,14 @@ export const buildDeleteDataModelInput = (
   };
 };
 
+export const buildDeleteDetectionInput = (
+  overrides: Partial<DeleteDetectionInput> = {}
+): DeleteDetectionInput => {
+  return {
+    detections: 'detections' in overrides ? overrides.detections : [buildDeleteEntry()],
+  };
+};
+
 export const buildDeleteEntry = (overrides: Partial<DeleteEntry> = {}): DeleteEntry => {
   return {
     id: 'id' in overrides ? overrides.id : 'c332a174-a738-4158-8e60-4fd94281e5ed',
@@ -622,20 +631,6 @@ export const buildDeleteGlobalPythonModuleInput = (
 ): DeleteGlobalPythonModuleInput => {
   return {
     globals: 'globals' in overrides ? overrides.globals : [buildDeleteEntry()],
-  };
-};
-
-export const buildDeletePolicyInput = (
-  overrides: Partial<DeletePolicyInput> = {}
-): DeletePolicyInput => {
-  return {
-    policies: 'policies' in overrides ? overrides.policies : [buildDeleteEntry()],
-  };
-};
-
-export const buildDeleteRuleInput = (overrides: Partial<DeleteRuleInput> = {}): DeleteRuleInput => {
-  return {
-    rules: 'rules' in overrides ? overrides.rules : [buildDeleteEntry()],
   };
 };
 
@@ -909,6 +904,8 @@ export const buildGetS3LogIntegrationTemplateInput = (
     integrationLabel: 'integrationLabel' in overrides ? overrides.integrationLabel : 'Concrete',
     s3Bucket: 's3Bucket' in overrides ? overrides.s3Bucket : 'generating',
     kmsKey: 'kmsKey' in overrides ? overrides.kmsKey : 'Books',
+    managedBucketNotifications:
+      'managedBucketNotifications' in overrides ? overrides.managedBucketNotifications : false,
   };
 };
 
@@ -1559,6 +1556,12 @@ export const buildS3LogIntegration = (
     kmsKey: 'kmsKey' in overrides ? overrides.kmsKey : 'robust',
     s3PrefixLogTypes:
       's3PrefixLogTypes' in overrides ? overrides.s3PrefixLogTypes : [buildS3PrefixLogTypes()],
+    managedBucketNotifications:
+      'managedBucketNotifications' in overrides ? overrides.managedBucketNotifications : true,
+    notificationsConfigurationSucceeded:
+      'notificationsConfigurationSucceeded' in overrides
+        ? overrides.notificationsConfigurationSucceeded
+        : true,
     health: 'health' in overrides ? overrides.health : buildS3LogIntegrationHealth(),
     stackName: 'stackName' in overrides ? overrides.stackName : 'River',
   };
@@ -1577,6 +1580,10 @@ export const buildS3LogIntegrationHealth = (
       's3BucketStatus' in overrides ? overrides.s3BucketStatus : buildIntegrationItemHealthStatus(),
     kmsKeyStatus:
       'kmsKeyStatus' in overrides ? overrides.kmsKeyStatus : buildIntegrationItemHealthStatus(),
+    getObjectStatus:
+      'getObjectStatus' in overrides
+        ? overrides.getObjectStatus
+        : buildIntegrationItemHealthStatus(),
   };
 };
 

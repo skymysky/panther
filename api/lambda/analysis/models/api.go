@@ -77,6 +77,7 @@ type LambdaInput struct {
 
 type UnitTest struct {
 	ExpectedResult bool   `json:"expectedResult"`
+	Mocks          string `json:"mocks"`
 	Name           string `json:"name" validate:"required"`
 	Resource       string `json:"resource" validate:"required"`
 }
