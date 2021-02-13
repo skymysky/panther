@@ -58,6 +58,10 @@ func check(err error) {
 	}
 }
 
+// Main will
+// Get user input to determine flush, inspect, or save
+// If save, create a file where entries will be saved
+// If inspect, ignore save and flush
 func main() {
 	startTime := time.Now()
 
@@ -92,7 +96,7 @@ func main() {
 		printfln("INSPECT")
 	}
 
-	var auditFile *os.File
+	var saveFile *os.File
 
 	// This will catch any calls to panic and close/remove the audit file if necessary
 	defer func() {
@@ -107,8 +111,9 @@ func main() {
 			}
 		}
 
-		// Close the file and remove file depending on boolean of 3rd parameter and file is empty
-		if err := cleanup(log, auditFile, true); err != nil {
+		// cleanup will close the file and remove it if the file size is zero and:
+		// param3 is true or cleanup recovers from a panic error and fsize is zero
+		if err := cleanup(log, saveFile, true); err != nil {
 			log.Error(err)
 			exitCode = 1
 		}
@@ -144,11 +149,11 @@ func main() {
 		log.Debug("WRITEDIR=", writeDir)
 
 		// Audit file full path
-		auditFilePath := filepath.Join(writeDir, writeFName)
-		log.Debug("AUDITFILEPATH=", auditFilePath)
+		saveFilePath := filepath.Join(writeDir, writeFName)
+		log.Debug("SAVEFILEPATH=", saveFilePath)
 
 		// Create the file
-		auditFile, err = os.Create(auditFilePath)
+		saveFile, err = os.Create(saveFilePath)
 		check(err)
 	}
 
@@ -157,24 +162,22 @@ func main() {
 	check(err)
 
 	// Execute the scan, save, and flush (depending on params)
-	FlushSaveInspectResources(dynamodb.New(awsSession), auditFile, flush, save, inspect)
+	FlushSaveInspectResources(dynamodb.New(awsSession), saveFile, flush, save, inspect)
 }
 
-// Closes auditFile and removes when auditfile sz is 0 and rmEmptyFile is true
-func cleanup(log *zap.SugaredLogger, auditFile *os.File, rmEmptyFile bool) error {
+// Closes save file and removes it if the file size is 0 and (rmEmptyFile is true or we recover from an error)
+func cleanup(log *zap.SugaredLogger, saveFile *os.File, rmEmptyFile bool) error {
 	log.Debug("RMEMPTYFILE=", rmEmptyFile)
 	// Check / close the audit file
-	if auditFile == nil {
+	if saveFile == nil {
 		return nil
 	}
-
-	auditFPath := auditFile.Name()
-	log.Debug("AUDITFILEPATH=", auditFPath)
-
+	saveFPath := saveFile.Name()
+	log.Debug("SAVEFILEPATH=", saveFPath)
 	// Close the file after getting the file stats, check for stat errors after closing the file
-	auditFStat, err := auditFile.Stat()
-	log.Debug("Close auditFile")
-	auditFile.Close()
+	auditFStat, err := saveFile.Stat()
+	log.Debug("Close saveFile")
+	saveFile.Close()
 	if err != nil {
 		return err
 	}
@@ -183,16 +186,20 @@ func cleanup(log *zap.SugaredLogger, auditFile *os.File, rmEmptyFile bool) error
 		return nil
 	}
 	log.Debug("AUDITFILESIZE=", auditFSize)
-	if err = os.Remove(auditFPath); err != nil {
+	if err = os.Remove(saveFPath); err != nil {
 		return err
 	}
-	log.Debug("Removed ", auditFPath)
+	log.Debug("Removed ", saveFPath)
 	return nil
 }
 
 // Flush runs all the inspect, flush, and save commands. This method can be called on its own
 // assuming the inputs are valid.
 func FlushSaveInspectResources(svc *dynamodb.DynamoDB, saveWriter io.Writer, flush, save, inspect bool) {
+	// Ensure inspect over-rides any flush or save
+	flush = flush && !inspect
+	save = save && !inspect
+
 	// Check if the scanAuditFlushResources method has nothing to do
 	if !flush && !save && !inspect {
 		check(errors.New("FlushSaveInspectResources requires flush, inspect, or a valid writer and save"))
