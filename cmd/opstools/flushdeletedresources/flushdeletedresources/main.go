@@ -74,13 +74,9 @@ func check(err error) {
 	}
 }
 
-func init() {
-	flag.Usage = usage
-}
-
 func main() {
 	startTime := time.Now()
-
+	flag.Usage = usage
 	opts := CLIOpts{
 		Save:    flag.Bool("save",    false, "Save Id's of panther-resources entries where delete=true to ./flush_resource_ids_<start_epoch>"),
 		Debug:   flag.Bool("debug",   false, "Enable debug logging"),
@@ -91,7 +87,12 @@ func main() {
 	flag.Parse()
 
 	if *opts.Version {
-		versionInfo()
+		_, BIN, ARCH, OS := binMeta()
+		printfln("ARCH=%v", ARCH)
+		printfln("BIN=%v", BIN)
+		printfln("OS=%v", OS)
+		printfln("VERSION=%v", version)
+		return
 	}
 
 	// If Inspect is specified we disable save and flush
@@ -107,14 +108,14 @@ func main() {
 		flag.Usage()
 	}
 
+	// Save, Flush and Inspect require an aws session which can take a few seconds to fail so
+	// we print the command before proceeding for user experience
 	if *opts.Save {
 		printfln("SAVE")
 	}
-
 	if *opts.Flush {
 		printfln("FLUSH")
 	}
-
 	if *opts.Inspect {
 		printfln("INSPECT")
 	}
@@ -296,14 +297,6 @@ func binMeta() (NAME, BIN, ARCH, OS string) {
 }
 
 // COSMETIC Helpers:
-func versionInfo() {
-	_, BIN, ARCH, OS := binMeta()
-	printfln("ARCH=%v", ARCH)
-	printfln("BIN=%v", BIN)
-	printfln("OS=%v", OS)
-	printfln("VERSION=%v", version)
-	os.Exit(0)
-}
 func usage() {
 	NAME, BIN, _, _ := binMeta()
 	printfln("\n%v\n", NAME)
@@ -316,8 +309,8 @@ func usage() {
 	printfln("  Save is not necessary for most users. Use inspect before save to view the number")
 	printfln("  of items with delete=true, and to see the estimated file size of the save file.\n")
 	printfln("  Inspect and version will return without running save or flush.\n")
-	printfln("  Save will not create a file when the resources table has no entries")
-	printfln("  pending deletion\n")
+	printfln("  Save will not create a file when the resources table has no entries pending")
+	printfln("  deletion\n")
 	printfln("  Flush is the only option that will remove entries from the resources table\n")
 	printfln("REQUIREMENTS:\n")
 	printfln("  This tool requires aws credentials with dynamodb panther-resources table permissions:\n")
