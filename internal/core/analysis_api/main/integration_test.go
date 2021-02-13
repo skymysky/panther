@@ -57,7 +57,7 @@ const (
 	bulkInvalidDatamodelTypeDir      = "datamodel_invalid_logtype"
 	bulkInvalidPolicyResourceTypeDir = "policy_invalid_resourcetype"
 
-	packVersionID = 35328828
+	packVersionID = 111 //TODO: Update with `panther-analysis v1.16.0 ID`
 )
 
 var (
@@ -179,37 +179,12 @@ var (
 			},
 		},
 	}
-	packOriginalRelease = &models.Pack{
-		AvailableVersions: []models.Version{
-			{ID: packVersionID, SemVer: "v1.14.0"},
-		},
-		CreatedBy:   systemUserID,
-		Description: "This pack is an example",
-		PackDefinition: models.PackDefinition{
-			IDs: []string{
-				"AWS.CloudTrail.Created",
-				"AWS.Console.LoginFailed",
-				"AWS.Console.LoginWithoutMFA"},
-		},
-		DisplayName:    "A Sample Pack",
-		Enabled:        false,
-		ID:             "Sample.Pack.ID",
-		LastModifiedBy: systemUserID,
-		PackVersion: models.Version{
-			ID:     packVersionID,
-			SemVer: "v1.14.0",
-		},
-		UpdateAvailable: false,
-		PackTypes: map[models.DetectionType]int{
-			models.TypeRule: 3,
-		},
-	}
 	packOriginalReleaseStandardSet = &models.Pack{
 		AvailableVersions: []models.Version{
-			{ID: packVersionID, SemVer: "v1.14.0"},
+			{ID: packVersionID, SemVer: "v1.16.0"},
 		},
 		CreatedBy:   systemUserID,
-		Description: "This pack groups the standard rules that leverage universal data models",
+		Description: "This pack groups the standard rules that leverage unified data models",
 		PackDefinition: models.PackDefinition{
 			IDs: []string{
 				"Standard.AWS.ALB",
@@ -225,13 +200,13 @@ var (
 				"Standard.BruteForceByIP",
 			},
 		},
-		DisplayName:    "Standard Ruleset Pack",
+		DisplayName:    "Panther Universal Detections",
 		Enabled:        false,
-		ID:             "Standard.Ruleset",
+		ID:             "PantherManaged.UniversalDetections",
 		LastModifiedBy: systemUserID,
 		PackVersion: models.Version{
 			ID:     packVersionID,
-			SemVer: "v1.14.0",
+			SemVer: "v1.16.0",
 		},
 		UpdateAvailable: false,
 		PackTypes: map[models.DetectionType]int{
@@ -2974,24 +2949,16 @@ func pollPacks(t *testing.T) {
 	statusCode, err = apiClient.Invoke(&input, &result)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, statusCode)
-	for _, pack := range result.Packs {
-		if pack.ID == packOriginalRelease.ID {
-			packOriginalRelease.CreatedAt = pack.CreatedAt
-			packOriginalRelease.LastModified = pack.LastModified
-		} else if pack.ID == packOriginalReleaseStandardSet.ID {
-			packOriginalReleaseStandardSet.CreatedAt = pack.CreatedAt
-			packOriginalReleaseStandardSet.LastModified = pack.LastModified
-		}
-	}
+	packOriginalReleaseStandardSet.CreatedAt = result.Packs[0].CreatedAt
+	packOriginalReleaseStandardSet.LastModified = result.Packs[0].LastModified
 	expected = models.ListPacksOutput{
 		Paging: models.Paging{
 			ThisPage:   1,
-			TotalItems: 2,
+			TotalItems: 1,
 			TotalPages: 1,
 		},
 		Packs: []models.Pack{
 			*packOriginalReleaseStandardSet,
-			*packOriginalRelease,
 		},
 	}
 	assert.Equal(t, expected, result)
@@ -3005,13 +2972,13 @@ func pollPacks(t *testing.T) {
 func getPack(t *testing.T) {
 	// success
 	input := models.LambdaInput{
-		GetPack: &models.GetPackInput{ID: packOriginalRelease.ID},
+		GetPack: &models.GetPackInput{ID: packOriginalReleaseStandardSet.ID},
 	}
 	var result models.Pack
 	statusCode, err := apiClient.Invoke(&input, &result)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, *packOriginalRelease, result)
+	assert.Equal(t, *packOriginalReleaseStandardSet, result)
 
 	// does not exist
 	input = models.LambdaInput{
@@ -3035,12 +3002,11 @@ func listPacks(t *testing.T) {
 	expected := models.ListPacksOutput{
 		Paging: models.Paging{
 			ThisPage:   1,
-			TotalItems: 2,
+			TotalItems: 1,
 			TotalPages: 1,
 		},
 		Packs: []models.Pack{
 			*packOriginalReleaseStandardSet,
-			*packOriginalRelease,
 		},
 	}
 	assert.Equal(t, expected, result)
@@ -3052,26 +3018,14 @@ func listPacks(t *testing.T) {
 }
 
 func enumeratePack(t *testing.T) {
-	// success
-	input := models.LambdaInput{
-		EnumeratePack: &models.EnumeratePackInput{
-			ID: packOriginalRelease.ID,
-		},
-	}
-	var result models.EnumeratePackOutput
-	statusCode, err := apiClient.Invoke(&input, &result)
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, 3, len(result.Detections))
-	assert.Equal(t, 0, len(result.Models))
-	assert.Equal(t, 0, len(result.Globals))
 	// no such pack
-	input = models.LambdaInput{
+	input := models.LambdaInput{
 		EnumeratePack: &models.EnumeratePackInput{
 			ID: "no.such.pack",
 		},
 	}
-	_, err = apiClient.Invoke(&input, &result)
+	var result models.EnumeratePackOutput
+	_, err := apiClient.Invoke(&input, &result)
 	assert.Error(t, err)
 	// First, have to enable to pack to get the detections in
 	var modifyResult models.Pack
@@ -3083,7 +3037,7 @@ func enumeratePack(t *testing.T) {
 			UserID:    userID,
 		},
 	}
-	statusCode, err = apiClient.Invoke(&modifyInput, &modifyResult)
+	statusCode, err := apiClient.Invoke(&modifyInput, &modifyResult)
 	// update appropriate fields to compare
 	packOriginalReleaseStandardSet.Enabled = true
 	packOriginalReleaseStandardSet.LastModified = modifyResult.LastModified
@@ -3110,36 +3064,36 @@ func patchPack(t *testing.T) {
 	var result models.Pack
 	input := models.LambdaInput{
 		PatchPack: &models.PatchPackInput{
-			ID:        packOriginalRelease.ID,
+			ID:        packOriginalReleaseStandardSet.ID,
 			Enabled:   false,
-			VersionID: packOriginalRelease.PackVersion.ID,
+			VersionID: packOriginalReleaseStandardSet.PackVersion.ID,
 			UserID:    userID,
 		},
 	}
-	packOriginalRelease.LastModifiedBy = userID
-	packOriginalRelease.Enabled = false
+	packOriginalReleaseStandardSet.LastModifiedBy = userID
+	packOriginalReleaseStandardSet.Enabled = false
 	statusCode, err := apiClient.Invoke(&input, &result)
-	packOriginalRelease.LastModified = result.LastModified
+	packOriginalReleaseStandardSet.LastModified = result.LastModified
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, *packOriginalRelease, result)
+	assert.Equal(t, *packOriginalReleaseStandardSet, result)
 	// TODO: lookup detection in pack and ensure enabled: false
 
 	// enable pack
 	input = models.LambdaInput{
 		PatchPack: &models.PatchPackInput{
-			ID:        packOriginalRelease.ID,
+			ID:        packOriginalReleaseStandardSet.ID,
 			Enabled:   true,
-			VersionID: packOriginalRelease.PackVersion.ID,
+			VersionID: packOriginalReleaseStandardSet.PackVersion.ID,
 			UserID:    userID,
 		},
 	}
-	packOriginalRelease.Enabled = true
+	packOriginalReleaseStandardSet.Enabled = true
 	statusCode, err = apiClient.Invoke(&input, &result)
-	packOriginalRelease.LastModified = result.LastModified
+	packOriginalReleaseStandardSet.LastModified = result.LastModified
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, *packOriginalRelease, result)
+	assert.Equal(t, *packOriginalReleaseStandardSet, result)
 	// TODO: lookup detection in pack and ensure enabled:true
 
 	/*TODO
