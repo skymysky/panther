@@ -20,12 +20,6 @@ package handlers
 
 import (
 	"context"
-	"crypto"
-	"crypto/rsa"
-	"crypto/sha512"
-	"crypto/x509"
-	"encoding/base64"
-	"encoding/pem"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/service/kms"
@@ -119,6 +113,7 @@ func getReleaseName(config githubwrapper.Config, version int64) (string, error) 
 	return githubClient.GetReleaseTagName(context.TODO(), config, version)
 }
 
+/* This can be used for general sign/verify if we want to use pub keys in config
 // validateSignature can validate data that is signed by RSA key
 func validateSignature(publicKey []byte, rawData []byte, signature []byte) error {
 	// use hash of body in validation
@@ -143,4 +138,4 @@ func validateSignature(publicKey []byte, rawData []byte, signature []byte) error
 	pubKey := key.(*rsa.PublicKey)
 	err = rsa.VerifyPKCS1v15(pubKey, crypto.SHA512, computedHash[:], decodedSignature)
 	return err
-}
+} */
