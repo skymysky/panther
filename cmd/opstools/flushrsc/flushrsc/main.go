@@ -46,22 +46,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Struct used to capture user input
-type CLIOpts struct {
-	Save,
-	Debug,
-	Version,
-	Inspect,
-	Flush *bool
-}
-func (cliOpts CLIOpts) LogVals(log func(args ...interface{})) {
-	log("CLI Argument Options Values:")
-	log("  Debug=", *cliOpts.Debug)
-	log("  Inspect=", *cliOpts.Inspect)
-	log("  Flush=", *cliOpts.Flush)
-	log("  Save=", *cliOpts.Save)
-}
-
 const tableName = "panther-resources"
 const maxBackoff = 60 * time.Second
 
@@ -76,17 +60,10 @@ func check(err error) {
 
 func main() {
 	startTime := time.Now()
-	flag.Usage = usage
-	opts := CLIOpts{
-		Save:    flag.Bool("save",    false, "Save Id's of panther-resources entries where delete=true to ./flush_resource_ids_<start_epoch>"),
-		Debug:   flag.Bool("debug",   false, "Enable debug logging"),
-		Inspect: flag.Bool("inspect", false, "Print number of panther-resources entries where delete=true and the estimated save file size"),
-		Version: flag.Bool("version", false, "Print ARCH, BIN, OS, and VERSION"),
-		Flush:   flag.Bool("flush",   false, "Remove entries from the panther-resources table where deleted=true"),
-	}
-	flag.Parse()
 
-	if *opts.Version {
+	debug, flush, inspect, save, versionOpt := getOpts()
+
+	if versionOpt {
 		_, BIN, ARCH, OS := binMeta()
 		printfln("ARCH=%v", ARCH)
 		printfln("BIN=%v", BIN)
@@ -95,28 +72,23 @@ func main() {
 		return
 	}
 
-	// If Inspect is specified we disable save and flush
-	*opts.Save = *opts.Save && !*opts.Inspect
-	*opts.Flush = *opts.Flush && !*opts.Inspect
-
-	log := opstools.MustBuildLogger(*opts.Debug)
+	log := opstools.MustBuildLogger(debug)
 	log.Debug("STARTEPOCH=", startTime.Unix())
 
 	// Debug log the CLI options values
-	opts.LogVals(log.Debug)
-	if !*opts.Flush && !*opts.Save && !*opts.Inspect {
+	if !flush && !save && !inspect {
 		flag.Usage()
 	}
 
 	// Save, Flush and Inspect require an aws session which can take a few seconds to fail so
 	// we print the command before proceeding for user experience
-	if *opts.Save {
+	if save {
 		printfln("SAVE")
 	}
-	if *opts.Flush {
+	if flush {
 		printfln("FLUSH")
 	}
-	if *opts.Inspect {
+	if inspect {
 		printfln("INSPECT")
 	}
 
@@ -161,13 +133,9 @@ func main() {
 		os.Exit(exitCode)
 	}()
 
-	// If user specified Audit, Generate the audit file destination basename and full directory
-	// and create the file ./flush_resources_audit_<start_unix_epoch_time>
-	if *opts.Save {
-		printfln("SAVE")
-
+	if save {
 		// basename
-		writeFName := fmt.Sprintf("flush_resources_audit_%v", startTime.Unix())
+		writeFName := fmt.Sprintf("flush_resource_ids_%v", startTime.Unix())
 		log.Debug("WRITEFNAME=", writeFName)
 
 		// destination directory path
@@ -189,7 +157,7 @@ func main() {
 	check(err)
 
 	// Execute the scan, save, and flush (depending on params)
-	FlushSaveInspectResources(dynamodb.New(awsSession), auditFile, *opts.Flush, *opts.Save, *opts.Inspect)
+	FlushSaveInspectResources(dynamodb.New(awsSession), auditFile, flush, save, inspect)
 }
 
 // Closes auditFile and removes when auditfile sz is 0 and rmEmptyFile is true
@@ -199,7 +167,7 @@ func cleanup(log *zap.SugaredLogger, auditFile *os.File, rmEmptyFile bool) error
 	if auditFile == nil {
 		return nil
 	}
-	var auditFSize int64 = -1
+
 	auditFPath := auditFile.Name()
 	log.Debug("AUDITFILEPATH=", auditFPath)
 
@@ -210,10 +178,10 @@ func cleanup(log *zap.SugaredLogger, auditFile *os.File, rmEmptyFile bool) error
 	if err != nil {
 		return err
 	}
+	auditFSize := auditFStat.Size()
 	if !rmEmptyFile || auditFSize > 0 {
 		return nil
 	}
-	auditFSize = auditFStat.Size()
 	log.Debug("AUDITFILESIZE=", auditFSize)
 	if err = os.Remove(auditFPath); err != nil {
 		return err
@@ -222,11 +190,9 @@ func cleanup(log *zap.SugaredLogger, auditFile *os.File, rmEmptyFile bool) error
 	return nil
 }
 
-//
+// Flush runs all the inspect, flush, and save commands. This method can be called on its own
+// assuming the inputs are valid.
 func FlushSaveInspectResources(svc *dynamodb.DynamoDB, saveWriter io.Writer, flush, save, inspect bool) {
-	flush = flush && !inspect
-	save = save && !inspect
-
 	// Check if the scanAuditFlushResources method has nothing to do
 	if !flush && !save && !inspect {
 		check(errors.New("FlushSaveInspectResources requires flush, inspect, or a valid writer and save"))
@@ -266,15 +232,15 @@ func FlushSaveInspectResources(svc *dynamodb.DynamoDB, saveWriter io.Writer, flu
 	check(svc.ScanPages(scanInput, resultScanner))
 	flush = flush && len(deleteRequests) > 0
 
-	printfln("Items pending deletion: %v\n", len(deleteRequests))
+	printfln("Items pending deletion: %v", len(deleteRequests))
 
-	if save && len(deleteRequests) > 0 {
+	if inspect && len(deleteRequests) > 0 {
 		// Set initial size to length of items to add size of required newline characters
 		var sumSz int64 = int64(len(deleteRequests))
 		for _, item := range deleteRequests {
 			sumSz += int64(len(*item.DeleteRequest.Key["id"].S))
 		}
-		printfln("Save estimated file size: %v\n", humanByteSize(sumSz))
+		printfln("Save file estimated size: %v", humanByteSize(sumSz))
 	}
 	if flush {
 		// Batch write request parameter containing set of delete item requests
@@ -287,12 +253,33 @@ func FlushSaveInspectResources(svc *dynamodb.DynamoDB, saveWriter io.Writer, flu
 	}
 }
 
+// Parses the name of the binary to retrieve the GOOS, GOARCH, Binary Name and the tool Name.
 func binMeta() (NAME, BIN, ARCH, OS string) {
 	BIN = filepath.Base(os.Args[0])
 	versionMeta := strings.Split(BIN, "-")
 	ARCH = versionMeta[2]
 	NAME = versionMeta[0]
 	OS = versionMeta[1]
+	return
+}
+
+// returns values of the required cli options where true means the option was specified in the cli args.
+func getOpts() (debug, flush, inspect, save, versionOpt bool) {
+	flag.Usage = usage
+	cliDebug := flag.Bool("debug", false, "Enable debug logging")
+	cliFlush := flag.Bool("flush", false, "Remove entries from the panther-resources table where deleted=true")
+	cliInspect := flag.Bool("inspect", false, "Print number of panther-resources entries where delete=true and the estimated save file size")
+	cliSave := flag.Bool("save", false, "Save Id's of panther-resources entries where delete=true to ./flush_resource_ids_<start_epoch>")
+	cliVersion := flag.Bool("version", false, "Print ARCH, BIN, OS, and VERSION")
+	flag.Parse()
+	debug = *cliDebug
+	flush = *cliFlush
+	inspect = *cliInspect
+	save = *cliSave
+	versionOpt = *cliVersion
+	// If Inspect is specified we disable save and flush
+	flush = flush && !inspect
+	save = save && !inspect
 	return
 }
 
