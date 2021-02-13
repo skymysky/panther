@@ -175,8 +175,27 @@
         },
         "indicators": {
           "type": "array",
+          "minLength": 1,
           "items": {
             "$ref": "#/definitions/indicator"
+          }
+        },
+        "allowValues": {
+          "$comment": "Allowed values",
+          "type": "array",
+          "minLength": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "denyValues": {
+          "$comment": "Denied values",
+          "type": "array",
+          "minLength": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },

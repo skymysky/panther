@@ -120,8 +120,8 @@ func buildStructTag(schema *FieldSchema) reflect.StructTag {
 		name = "-"
 	}
 	tag := fmt.Sprintf(`json:"%s,omitempty"`, name)
-	if schema.Required {
-		tag += ` validate:"required"`
+	if rules := buildValidate(schema); len(rules) > 0 {
+		tag += fmt.Sprintf(` validate:"%s"`, strings.Join(rules, ","))
 	}
 	tag = extendStructTag(&schema.ValueSchema, tag)
 	desc := normalizeSpace(schema.Description)
@@ -130,6 +130,49 @@ func buildStructTag(schema *FieldSchema) reflect.StructTag {
 	}
 	tag += fmt.Sprintf(` description:"%s"`, desc)
 	return reflect.StructTag(tag)
+}
+
+func buildValidate(s *FieldSchema) (rules []string) {
+	// The precedence is Allow > Deny
+	if len(s.Allow) > 0 {
+		rules = append(rules, multiRule("eq", s.Allow...))
+	} else if len(s.Deny) > 0 {
+		rules = append(rules, multiRule("ne", s.Deny...))
+	}
+	if s.Required {
+		return append(rules, "required")
+	}
+	if len(rules) == 0 {
+		return rules
+	}
+	return append(rules, "omitempty")
+}
+
+func multiRule(op string, values ...string) string {
+	rule := make([]string, len(values))
+	// We need to escape to ASCII to make sure struct tags are not broken by whitespace or quotes
+	for i, v := range values {
+		rule[i] = op + "=" + escapeTagSafe(v)
+	}
+	return strings.Join(rule, "|")
+}
+
+func escapeTagSafe(s string) string {
+	w := strings.Builder{}
+	w.Grow(len(s))
+	for _, r := range s {
+		switch r {
+		case ',':
+			w.WriteString("0x2C")
+		case '|':
+			w.WriteString("0x7C")
+		case '"', '`':
+			w.WriteString(fmt.Sprintf(`\u%04x`, r))
+		default:
+			w.WriteRune(r)
+		}
+	}
+	return w.String()
 }
 
 func normalizeSpace(input string) string {
@@ -150,10 +193,10 @@ func extendStructTag(schema *ValueSchema, tag string) string {
 	case TypeArray:
 		return extendStructTag(schema.Element, tag)
 	case TypeString:
-		if len(schema.Indicators) == 0 {
-			return tag
+		if len(schema.Indicators) > 0 {
+			tag += fmt.Sprintf(` panther:"%s"`, strings.Join(schema.Indicators, ","))
 		}
-		return tag + fmt.Sprintf(` panther:"%s"`, strings.Join(schema.Indicators, ","))
+		return tag
 	case TypeTimestamp:
 		if schema.IsEventTime {
 			tag = tag + ` event_time:"true"`
