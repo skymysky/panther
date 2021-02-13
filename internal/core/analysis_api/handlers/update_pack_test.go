@@ -33,20 +33,24 @@ var (
 	dataModelDetectionID = "detection.datamodel"
 
 	ruleDetection = &tableItem{
-		ID:   ruleDetectionID,
-		Type: models.TypeRule,
+		ID:      ruleDetectionID,
+		Enabled: true,
+		Type:    models.TypeRule,
 	}
 	policyDetection = &tableItem{
-		ID:   policyDetectionID,
-		Type: models.TypePolicy,
+		ID:      policyDetectionID,
+		Enabled: true,
+		Type:    models.TypePolicy,
 	}
 	globalDetection = &tableItem{
-		ID:   globalDetectionID,
-		Type: models.TypeGlobal,
+		ID:      globalDetectionID,
+		Enabled: true,
+		Type:    models.TypeGlobal,
 	}
 	dataModelDetection = &tableItem{
-		ID:   dataModelDetectionID,
-		Type: models.TypeDataModel,
+		ID:      dataModelDetectionID,
+		Enabled: true,
+		Type:    models.TypeDataModel,
 	}
 	allDetections = map[string]*tableItem{
 		policyDetectionID:    policyDetection,
@@ -55,6 +59,26 @@ var (
 		dataModelDetectionID: dataModelDetection,
 	}
 )
+
+func TestIsDetectionInMultipleEnabledPacks(t *testing.T) {
+	detectionsToPacks := map[string][]*packTableItem{
+		ruleDetectionID: {
+			&packTableItem{ID: "pack.one", Enabled: false},
+		},
+		globalDetectionID: {
+			&packTableItem{ID: "pack.two", Enabled: true},
+		},
+	}
+	// detection not in any other pack
+	result := isDetectionInEnabledPack(detectionsToPacks, "pack.three", policyDetectionID)
+	assert.False(t, result)
+	// detection in another pack, but it is disabled
+	result = isDetectionInEnabledPack(detectionsToPacks, "pack.three", ruleDetectionID)
+	assert.False(t, result)
+	// detection in another pack that is enabled
+	result = isDetectionInEnabledPack(detectionsToPacks, "pack.three", globalDetectionID)
+	assert.True(t, result)
+}
 
 func TestSetupUpdatePacksVersions(t *testing.T) {
 	// This tests setting up pack items when there is
