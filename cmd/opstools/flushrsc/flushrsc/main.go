@@ -98,7 +98,8 @@ func main() {
 
 	var saveFile *os.File
 
-	// This will catch any calls to panic and close/remove the audit file if necessary
+	// This will catch any calls to panic. This method will always call the cleanup method which
+	// closes/removes the save file if necessary
 	defer func() {
 		var recoveryErr error = nil
 		exitCode := 0
@@ -168,24 +169,24 @@ func main() {
 // Closes save file and removes it if the file size is 0 and (rmEmptyFile is true or we recover from an error)
 func cleanup(log *zap.SugaredLogger, saveFile *os.File, rmEmptyFile bool) error {
 	log.Debug("RMEMPTYFILE=", rmEmptyFile)
-	// Check / close the audit file
+	// Check / close the save file
 	if saveFile == nil {
 		return nil
 	}
 	saveFPath := saveFile.Name()
 	log.Debug("SAVEFILEPATH=", saveFPath)
 	// Close the file after getting the file stats, check for stat errors after closing the file
-	auditFStat, err := saveFile.Stat()
+	saveFStat, err := saveFile.Stat()
 	log.Debug("Close saveFile")
 	saveFile.Close()
 	if err != nil {
 		return err
 	}
-	auditFSize := auditFStat.Size()
-	if !rmEmptyFile || auditFSize > 0 {
+	saveFSize := saveFStat.Size()
+	if !rmEmptyFile || saveFSize > 0 {
 		return nil
 	}
-	log.Debug("AUDITFILESIZE=", auditFSize)
+	log.Debug("SAVEFILESIZE=", saveFSize)
 	if err = os.Remove(saveFPath); err != nil {
 		return err
 	}
