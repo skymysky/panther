@@ -119,11 +119,13 @@ export type AddS3LogIntegrationInput = {
   kmsKey?: Maybe<Scalars['String']>;
   s3PrefixLogTypes: Array<S3PrefixLogTypesInput>;
   managedBucketNotifications: Scalars['Boolean'];
+  logSourceId?: Maybe<Scalars['ID']>;
 };
 
 export type AddSqsLogIntegrationInput = {
   integrationLabel: Scalars['String'];
   sqsConfig: SqsLogConfigInput;
+  logSourceId?: Maybe<Scalars['ID']>;
 };
 
 export type Alert = {
@@ -223,6 +225,33 @@ export type AsanaConfig = {
 export type AsanaConfigInput = {
   personalAccessToken: Scalars['String'];
   projectGids: Array<Scalars['String']>;
+};
+
+export type AvailableLogSource = {
+  __typename?: 'AvailableLogSource';
+  id: Scalars['ID'];
+  displayName: Scalars['String'];
+  popularity: Scalars['Int'];
+  categories: Array<Scalars['String']>;
+  isEnterprise: Scalars['Boolean'];
+  availableParsers: Array<AvailableLogSourceParser>;
+  details?: Maybe<AvailableLogSourceDetails>;
+};
+
+export type AvailableLogSourceDetails = {
+  __typename?: 'AvailableLogSourceDetails';
+  appInfo?: Maybe<Scalars['String']>;
+  howItWorks?: Maybe<Scalars['String']>;
+  useCases?: Maybe<Scalars['String']>;
+  defaultParsers: Array<Scalars['String']>;
+  transports: Array<Scalars['String']>;
+};
+
+export type AvailableLogSourceParser = {
+  __typename?: 'AvailableLogSourceParser';
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  referenceUrl?: Maybe<Scalars['String']>;
 };
 
 export type ComplianceIntegration = {
@@ -641,6 +670,10 @@ export type ListAlertsResponse = {
 export enum ListAlertsSortFieldsEnum {
   CreatedAt = 'createdAt',
 }
+
+export type ListAvailableLogSourcesInput = {
+  category: Scalars['String'];
+};
 
 export type ListAvailableLogTypesResponse = {
   __typename?: 'ListAvailableLogTypesResponse';
@@ -1170,6 +1203,7 @@ export type Query = {
   destination?: Maybe<Destination>;
   destinations?: Maybe<Array<Maybe<Destination>>>;
   generalSettings: GeneralSettings;
+  getAvailableLogSource: AvailableLogSource;
   getComplianceIntegration: ComplianceIntegration;
   getComplianceIntegrationTemplate: IntegrationTemplate;
   getDataModel?: Maybe<DataModel>;
@@ -1184,6 +1218,7 @@ export type Query = {
   policy?: Maybe<Policy>;
   policiesForResource?: Maybe<ListComplianceItemsResponse>;
   listAvailableLogTypes: ListAvailableLogTypesResponse;
+  listAvailableLogSources: Array<AvailableLogSource>;
   listComplianceIntegrations: Array<ComplianceIntegration>;
   listDataModels: ListDataModelsResponse;
   listLogIntegrations: Array<LogIntegration>;
@@ -1214,6 +1249,10 @@ export type QuerySendTestAlertArgs = {
 };
 
 export type QueryDestinationArgs = {
+  id: Scalars['ID'];
+};
+
+export type QueryGetAvailableLogSourceArgs = {
   id: Scalars['ID'];
 };
 
@@ -1263,6 +1302,10 @@ export type QueryPolicyArgs = {
 
 export type QueryPoliciesForResourceArgs = {
   input?: Maybe<PoliciesForResourceInput>;
+};
+
+export type QueryListAvailableLogSourcesArgs = {
+  input?: Maybe<ListAvailableLogSourcesInput>;
 };
 
 export type QueryListDataModelsArgs = {
@@ -1360,6 +1403,7 @@ export type S3LogIntegration = {
   integrationId: Scalars['ID'];
   integrationType: Scalars['String'];
   integrationLabel: Scalars['String'];
+  logSourceId?: Maybe<Scalars['ID']>;
   lastEventReceived?: Maybe<Scalars['AWSDateTime']>;
   s3Bucket: Scalars['String'];
   s3Prefix?: Maybe<Scalars['String']>;
@@ -1479,6 +1523,7 @@ export type SqsLogSourceIntegration = {
   integrationLabel: Scalars['String'];
   integrationType: Scalars['String'];
   lastEventReceived?: Maybe<Scalars['AWSDateTime']>;
+  logSourceId?: Maybe<Scalars['ID']>;
   sqsConfig: SqsConfig;
   health: SqsLogIntegrationHealth;
 };
@@ -1820,6 +1865,9 @@ export type ResolversTypes = {
   AsanaConfig: ResolverTypeWrapper<AsanaConfig>;
   CustomWebhookConfig: ResolverTypeWrapper<CustomWebhookConfig>;
   GeneralSettings: ResolverTypeWrapper<GeneralSettings>;
+  AvailableLogSource: ResolverTypeWrapper<AvailableLogSource>;
+  AvailableLogSourceParser: ResolverTypeWrapper<AvailableLogSourceParser>;
+  AvailableLogSourceDetails: ResolverTypeWrapper<AvailableLogSourceDetails>;
   ComplianceIntegration: ResolverTypeWrapper<ComplianceIntegration>;
   ComplianceIntegrationHealth: ResolverTypeWrapper<ComplianceIntegrationHealth>;
   IntegrationItemHealthStatus: ResolverTypeWrapper<IntegrationItemHealthStatus>;
@@ -1852,6 +1900,7 @@ export type ResolversTypes = {
   Policy: ResolverTypeWrapper<Policy>;
   PoliciesForResourceInput: PoliciesForResourceInput;
   ListAvailableLogTypesResponse: ResolverTypeWrapper<ListAvailableLogTypesResponse>;
+  ListAvailableLogSourcesInput: ListAvailableLogSourcesInput;
   ListDataModelsInput: ListDataModelsInput;
   ListDataModelsSortFieldsEnum: ListDataModelsSortFieldsEnum;
   ListDataModelsResponse: ResolverTypeWrapper<ListDataModelsResponse>;
@@ -2011,6 +2060,9 @@ export type ResolversParentTypes = {
   AsanaConfig: AsanaConfig;
   CustomWebhookConfig: CustomWebhookConfig;
   GeneralSettings: GeneralSettings;
+  AvailableLogSource: AvailableLogSource;
+  AvailableLogSourceParser: AvailableLogSourceParser;
+  AvailableLogSourceDetails: AvailableLogSourceDetails;
   ComplianceIntegration: ComplianceIntegration;
   ComplianceIntegrationHealth: ComplianceIntegrationHealth;
   IntegrationItemHealthStatus: IntegrationItemHealthStatus;
@@ -2043,6 +2095,7 @@ export type ResolversParentTypes = {
   Policy: Policy;
   PoliciesForResourceInput: PoliciesForResourceInput;
   ListAvailableLogTypesResponse: ListAvailableLogTypesResponse;
+  ListAvailableLogSourcesInput: ListAvailableLogSourcesInput;
   ListDataModelsInput: ListDataModelsInput;
   ListDataModelsSortFieldsEnum: ListDataModelsSortFieldsEnum;
   ListDataModelsResponse: ListDataModelsResponse;
@@ -2285,6 +2338,46 @@ export type AsanaConfigResolvers<
 > = {
   personalAccessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   projectGids?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+};
+
+export type AvailableLogSourceResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['AvailableLogSource'] = ResolversParentTypes['AvailableLogSource']
+> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  popularity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  categories?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  isEnterprise?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  availableParsers?: Resolver<
+    Array<ResolversTypes['AvailableLogSourceParser']>,
+    ParentType,
+    ContextType
+  >;
+  details?: Resolver<Maybe<ResolversTypes['AvailableLogSourceDetails']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+};
+
+export type AvailableLogSourceDetailsResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['AvailableLogSourceDetails'] = ResolversParentTypes['AvailableLogSourceDetails']
+> = {
+  appInfo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  howItWorks?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  useCases?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  defaultParsers?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  transports?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+};
+
+export type AvailableLogSourceParserResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['AvailableLogSourceParser'] = ResolversParentTypes['AvailableLogSourceParser']
+> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  referenceUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
@@ -3175,6 +3268,12 @@ export type QueryResolvers<
     ContextType
   >;
   generalSettings?: Resolver<ResolversTypes['GeneralSettings'], ParentType, ContextType>;
+  getAvailableLogSource?: Resolver<
+    ResolversTypes['AvailableLogSource'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryGetAvailableLogSourceArgs, 'id'>
+  >;
   getComplianceIntegration?: Resolver<
     ResolversTypes['ComplianceIntegration'],
     ParentType,
@@ -3252,6 +3351,12 @@ export type QueryResolvers<
     ResolversTypes['ListAvailableLogTypesResponse'],
     ParentType,
     ContextType
+  >;
+  listAvailableLogSources?: Resolver<
+    Array<ResolversTypes['AvailableLogSource']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryListAvailableLogSourcesArgs, never>
   >;
   listComplianceIntegrations?: Resolver<
     Array<ResolversTypes['ComplianceIntegration']>,
@@ -3378,6 +3483,7 @@ export type S3LogIntegrationResolvers<
   integrationId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   integrationType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   integrationLabel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  logSourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   lastEventReceived?: Resolver<Maybe<ResolversTypes['AWSDateTime']>, ParentType, ContextType>;
   s3Bucket?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   s3Prefix?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -3522,6 +3628,7 @@ export type SqsLogSourceIntegrationResolvers<
   integrationLabel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   integrationType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   lastEventReceived?: Resolver<Maybe<ResolversTypes['AWSDateTime']>, ParentType, ContextType>;
+  logSourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   sqsConfig?: Resolver<ResolversTypes['SqsConfig'], ParentType, ContextType>;
   health?: Resolver<ResolversTypes['SqsLogIntegrationHealth'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
@@ -3686,6 +3793,9 @@ export type Resolvers<ContextType = any> = {
   AlertSummaryPolicyInfo?: AlertSummaryPolicyInfoResolvers<ContextType>;
   AlertSummaryRuleInfo?: AlertSummaryRuleInfoResolvers<ContextType>;
   AsanaConfig?: AsanaConfigResolvers<ContextType>;
+  AvailableLogSource?: AvailableLogSourceResolvers<ContextType>;
+  AvailableLogSourceDetails?: AvailableLogSourceDetailsResolvers<ContextType>;
+  AvailableLogSourceParser?: AvailableLogSourceParserResolvers<ContextType>;
   AWSDateTime?: GraphQLScalarType;
   AWSEmail?: GraphQLScalarType;
   AWSJSON?: GraphQLScalarType;

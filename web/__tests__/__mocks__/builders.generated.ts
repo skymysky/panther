@@ -34,6 +34,9 @@ import {
   AlertSummaryRuleInfo,
   AsanaConfig,
   AsanaConfigInput,
+  AvailableLogSource,
+  AvailableLogSourceDetails,
+  AvailableLogSourceParser,
   ComplianceIntegration,
   ComplianceIntegrationHealth,
   ComplianceItem,
@@ -84,6 +87,7 @@ import {
   JiraConfigInput,
   ListAlertsInput,
   ListAlertsResponse,
+  ListAvailableLogSourcesInput,
   ListAvailableLogTypesResponse,
   ListComplianceItemsResponse,
   ListDataModelsInput,
@@ -304,6 +308,8 @@ export const buildAddS3LogIntegrationInput = (
       's3PrefixLogTypes' in overrides ? overrides.s3PrefixLogTypes : [buildS3PrefixLogTypesInput()],
     managedBucketNotifications:
       'managedBucketNotifications' in overrides ? overrides.managedBucketNotifications : false,
+    logSourceId:
+      'logSourceId' in overrides ? overrides.logSourceId : 'b9539866-8497-46e8-9a6e-2be222350e96',
   };
 };
 
@@ -314,6 +320,8 @@ export const buildAddSqsLogIntegrationInput = (
     integrationLabel:
       'integrationLabel' in overrides ? overrides.integrationLabel : 'data-warehouse',
     sqsConfig: 'sqsConfig' in overrides ? overrides.sqsConfig : buildSqsLogConfigInput(),
+    logSourceId:
+      'logSourceId' in overrides ? overrides.logSourceId : '1f2cb208-e248-47ad-a42a-9a9df5152378',
   };
 };
 
@@ -438,6 +446,48 @@ export const buildAsanaConfigInput = (
     personalAccessToken:
       'personalAccessToken' in overrides ? overrides.personalAccessToken : 'connect',
     projectGids: 'projectGids' in overrides ? overrides.projectGids : ['Executive'],
+  };
+};
+
+export const buildAvailableLogSource = (
+  overrides: Partial<AvailableLogSource> = {}
+): AvailableLogSource => {
+  return {
+    __typename: 'AvailableLogSource',
+    id: 'id' in overrides ? overrides.id : '3710f518-9be0-4a98-bd0e-2ba230e56a02',
+    displayName: 'displayName' in overrides ? overrides.displayName : 'Avon',
+    popularity: 'popularity' in overrides ? overrides.popularity : 652,
+    categories: 'categories' in overrides ? overrides.categories : ['workforce'],
+    isEnterprise: 'isEnterprise' in overrides ? overrides.isEnterprise : false,
+    availableParsers:
+      'availableParsers' in overrides
+        ? overrides.availableParsers
+        : [buildAvailableLogSourceParser()],
+    details: 'details' in overrides ? overrides.details : buildAvailableLogSourceDetails(),
+  };
+};
+
+export const buildAvailableLogSourceDetails = (
+  overrides: Partial<AvailableLogSourceDetails> = {}
+): AvailableLogSourceDetails => {
+  return {
+    __typename: 'AvailableLogSourceDetails',
+    appInfo: 'appInfo' in overrides ? overrides.appInfo : 'infomediaries',
+    howItWorks: 'howItWorks' in overrides ? overrides.howItWorks : 'PCI',
+    useCases: 'useCases' in overrides ? overrides.useCases : 'overriding',
+    defaultParsers: 'defaultParsers' in overrides ? overrides.defaultParsers : ['Intranet'],
+    transports: 'transports' in overrides ? overrides.transports : ['copy'],
+  };
+};
+
+export const buildAvailableLogSourceParser = (
+  overrides: Partial<AvailableLogSourceParser> = {}
+): AvailableLogSourceParser => {
+  return {
+    __typename: 'AvailableLogSourceParser',
+    name: 'name' in overrides ? overrides.name : 'architect',
+    description: 'description' in overrides ? overrides.description : 'Lakes',
+    referenceUrl: 'referenceUrl' in overrides ? overrides.referenceUrl : 'Borders',
   };
 };
 
@@ -1030,6 +1080,14 @@ export const buildListAlertsResponse = (
   };
 };
 
+export const buildListAvailableLogSourcesInput = (
+  overrides: Partial<ListAvailableLogSourcesInput> = {}
+): ListAvailableLogSourcesInput => {
+  return {
+    category: 'category' in overrides ? overrides.category : 'Overpass',
+  };
+};
+
 export const buildListAvailableLogTypesResponse = (
   overrides: Partial<ListAvailableLogTypesResponse> = {}
 ): ListAvailableLogTypesResponse => {
@@ -1559,6 +1617,8 @@ export const buildS3LogIntegration = (
         : '73041328-928c-4ff9-a396-06b9b769900d',
     integrationType: 'integrationType' in overrides ? overrides.integrationType : 'Computers',
     integrationLabel: 'integrationLabel' in overrides ? overrides.integrationLabel : 'transmitting',
+    logSourceId:
+      'logSourceId' in overrides ? overrides.logSourceId : '7fb65fa6-62c0-4efc-a89b-55c250973888',
     lastEventReceived:
       'lastEventReceived' in overrides ? overrides.lastEventReceived : '2020-05-25T09:20:29.138Z',
     s3Bucket: 's3Bucket' in overrides ? overrides.s3Bucket : 'generating',
@@ -1747,6 +1807,8 @@ export const buildSqsLogSourceIntegration = (
     integrationType: 'integrationType' in overrides ? overrides.integrationType : 'Sleek Steel Hat',
     lastEventReceived:
       'lastEventReceived' in overrides ? overrides.lastEventReceived : '2020-03-01T16:22:21.931Z',
+    logSourceId:
+      'logSourceId' in overrides ? overrides.logSourceId : '44559cb8-783a-4d1a-92fe-304dd641e6ec',
     sqsConfig: 'sqsConfig' in overrides ? overrides.sqsConfig : buildSqsConfig(),
     health: 'health' in overrides ? overrides.health : buildSqsLogIntegrationHealth(),
   };
