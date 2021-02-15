@@ -1357,7 +1357,7 @@ export const buildPackTypes = (overrides: Partial<PackTypes> = {}): PackTypes =>
 export const buildPackVersion = (overrides: Partial<PackVersion> = {}): PackVersion => {
   return {
     __typename: 'PackVersion',
-    id: 'id' in overrides ? overrides.id : 'Unbranded',
+    id: 'id' in overrides ? overrides.id : 99,
     semVer: 'semVer' in overrides ? overrides.semVer : 'Checking Account',
   };
 };
@@ -1366,7 +1366,7 @@ export const buildPackVersionInput = (
   overrides: Partial<PackVersionInput> = {}
 ): PackVersionInput => {
   return {
-    id: 'id' in overrides ? overrides.id : 'Garden',
+    id: 'id' in overrides ? overrides.id : 26,
     semVer: 'semVer' in overrides ? overrides.semVer : 'Towels',
   };
 };
@@ -1917,7 +1917,7 @@ export const buildUpdatePackInput = (overrides: Partial<UpdatePackInput> = {}): 
   return {
     enabled: 'enabled' in overrides ? overrides.enabled : true,
     id: 'id' in overrides ? overrides.id : 'cf999351-d016-4ca1-b52e-c9a8c1a47331',
-    packVersion: 'packVersion' in overrides ? overrides.packVersion : buildPackVersionInput(),
+    versionId: 'versionId' in overrides ? overrides.versionId : 69,
   };
 };
 

@@ -100,14 +100,14 @@ input ListPacksInput {
 }
 
 input PackVersionInput {
-  id: String!
+  id: Int!
   semVer: String!
 }
 
 input UpdatePackInput {
   enabled: Boolean
   id: ID!
-  packVersion: PackVersionInput
+  versionId: Int
 }
 
 input ListDetectionsInput {
@@ -493,7 +493,7 @@ type Rule implements Detection {
 }
 
 type PackVersion {
-  id: String!
+  id: Int!
   semVer: String!
 }
 

@@ -1102,12 +1102,12 @@ export type PackTypes = {
 
 export type PackVersion = {
   __typename?: 'PackVersion';
-  id: Scalars['String'];
+  id: Scalars['Int'];
   semVer: Scalars['String'];
 };
 
 export type PackVersionInput = {
-  id: Scalars['String'];
+  id: Scalars['Int'];
   semVer: Scalars['String'];
 };
 
@@ -1593,7 +1593,7 @@ export type UpdateGeneralSettingsInput = {
 export type UpdatePackInput = {
   enabled?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
-  packVersion?: Maybe<PackVersionInput>;
+  versionId?: Maybe<Scalars['Int']>;
 };
 
 export type UpdatePolicyInput = {
@@ -3093,7 +3093,7 @@ export type PackVersionResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['PackVersion'] = ResolversParentTypes['PackVersion']
 > = {
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   semVer?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
