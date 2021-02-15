@@ -138,6 +138,8 @@ func updateVersion(input *models.PatchPackInput, oldPackItem *packTableItem) *ev
 		}
 	}
 	if newPackItem, ok := packVersionSet[input.ID]; ok {
+		// ensure we keep the existing pack enabled status
+		newPackItem.Enabled = oldPackItem.Enabled
 		// Update the detections in the pack
 		err = updateDetectionsToVersion(input.UserID, newPackItem, detectionVersionSet)
 		if err != nil {
@@ -336,13 +338,13 @@ func updatePackVersions(newVersion models.Version, oldPackItems []*packTableItem
 			if !containsRelease(oldPack.AvailableVersions, newVersion.ID) {
 				// only add the new version to the availableVersions if it is not already there
 				oldPack.AvailableVersions = append(oldPack.AvailableVersions, newVersion)
-				oldPack.UpdateAvailable = true
+				oldPack.UpdateAvailable = isNewReleaseAvailable(oldPack.PackVersion, []*packTableItem{oldPack})
+				if err = updatePack(oldPack, oldPack.LastModifiedBy, aws.Bool(true)); err != nil {
+					return err
+				}
 			} else {
 				// the pack already knows about this version, just continue
 				continue
-			}
-			if err = updatePack(newPack, newPack.LastModifiedBy, aws.Bool(true)); err != nil {
-				return err
 			}
 		} else {
 			// Add a new pack, and auto-disable it. AvailableVersionss will only
