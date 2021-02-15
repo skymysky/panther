@@ -29,13 +29,13 @@ import { useGetS3LogSource } from 'Pages/EditS3LogSource/graphql/getS3LogSource.
 import HealthCheckWarning from './HealthCheckWarning';
 
 const HealthCheckPanel: React.FC = () => {
-  const { reset: resetWizard, integrationId } = useWizardContext();
+  const { reset: resetWizard, data: wizardData } = useWizardContext();
   const { initialValues, resetForm } = useFormikContext<S3LogSourceWizardValues>();
 
   const { data, loading, refetch } = useGetS3LogSource({
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only', // Don't use cache
-    variables: { id: integrationId },
+    variables: { id: wizardData.integrationId },
   });
 
   if (loading) {
@@ -87,7 +87,7 @@ const HealthCheckPanel: React.FC = () => {
                 <Link
                   as={RRLink}
                   variant="discreet"
-                  to={urls.logAnalysis.sources.edit(integrationId, 's3')}
+                  to={urls.logAnalysis.sources.edit(wizardData.integrationId, 's3')}
                 >
                   Edit Source Info
                 </Link>

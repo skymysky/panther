@@ -52,7 +52,7 @@ const ValidationPanel: React.FC = () => {
     reset: resetWizard,
     currentStepStatus,
     setCurrentStepStatus,
-    setIntegrationId,
+    updateData,
   } = useWizardContext();
   const { submitForm } = useFormikContext<S3LogSourceWizardValues>();
   const [shouldShowNotificationsScreen, setNotificationScreenVisibility] = React.useState(true);
@@ -70,7 +70,7 @@ const ValidationPanel: React.FC = () => {
           notificationsConfigurationSucceeded,
           integrationId: newIntegrationId,
         } = getResponseData(result);
-        setIntegrationId(newIntegrationId);
+        updateData({ integrationId: newIntegrationId });
         /* When this source is created or updated we need to check if user has selected to automate
          * setting up notifications, this can fail while the integration was successfully created
          * so we need to inform user if something went wrong so they can add them manually

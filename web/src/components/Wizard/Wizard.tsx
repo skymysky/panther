@@ -35,7 +35,6 @@ function Wizard<WizardData = any>({
 }: WizardProps<WizardData>): ReactElement {
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
   const [currentStepStatus, setCurrentStepStatus] = React.useState<StepStatus>('PENDING');
-  const [integrationId, setIntegrationId] = React.useState();
   const [wizardData, setWizardData] = React.useState<WizardData>(initialData);
   const prevStepIndex = React.useRef<number>(null);
 
@@ -119,9 +118,7 @@ function Wizard<WizardData = any>({
       reset: resetWizard,
       data: wizardData,
       currentStepStatus,
-      integrationId,
       setCurrentStepStatus,
-      setIntegrationId,
     }),
     [
       goToStep,
@@ -129,12 +126,10 @@ function Wizard<WizardData = any>({
       goToNextStep,
       wizardData,
       currentStepStatus,
-      integrationId,
       resetWizardData,
       setWizardData,
       updateWizardData,
       setCurrentStepStatus,
-      setIntegrationId,
     ]
   );
 
