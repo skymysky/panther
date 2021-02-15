@@ -1355,7 +1355,7 @@ export const buildPackVersion = (overrides: Partial<PackVersion> = {}): PackVers
   return {
     __typename: 'PackVersion',
     id: 'id' in overrides ? overrides.id : 'Unbranded',
-    name: 'name' in overrides ? overrides.name : 'Shirt',
+    semVer: 'semVer' in overrides ? overrides.semVer : 'Checking Account',
   };
 };
 
@@ -1364,7 +1364,7 @@ export const buildPackVersionInput = (
 ): PackVersionInput => {
   return {
     id: 'id' in overrides ? overrides.id : 'Garden',
-    name: 'name' in overrides ? overrides.name : 'plum',
+    semVer: 'semVer' in overrides ? overrides.semVer : 'Towels',
   };
 };
 

@@ -1097,12 +1097,12 @@ export type PackDetectionsPatterns = {
 export type PackVersion = {
   __typename?: 'PackVersion';
   id: Scalars['String'];
-  name: Scalars['String'];
+  semVer: Scalars['String'];
 };
 
 export type PackVersionInput = {
   id: Scalars['String'];
-  name: Scalars['String'];
+  semVer: Scalars['String'];
 };
 
 export type PagerDutyConfig = {
@@ -3069,7 +3069,7 @@ export type PackVersionResolvers<
   ParentType extends ResolversParentTypes['PackVersion'] = ResolversParentTypes['PackVersion']
 > = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  semVer?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 

@@ -7,12 +7,12 @@ fragment PackDetails on Pack {
 
     packVersion {
         id
-        name
+        semVer
     }
 
     availableVersions {
         id
-        name
+        semVer
     }
     detectionTypes {
         GLOBAL

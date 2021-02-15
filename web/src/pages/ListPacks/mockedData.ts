@@ -19,11 +19,11 @@
 // TODO: Remove this file
 import { buildPack, buildPackVersion } from '../../../__tests__/__mocks__/builders.generated';
 
-const packVersion1 = buildPackVersion({ id: '123', name: 'v2.1.3' });
-const packVersion2 = buildPackVersion({ id: '456', name: 'v2.1.0' });
-const packVersion3 = buildPackVersion({ id: '124', name: 'v2.0.0' });
-const packVersion4 = buildPackVersion({ id: '31231', name: 'v1.21.1' });
-const packVersion5 = buildPackVersion({ id: '3412', name: 'v1.21.0' });
+const packVersion1 = buildPackVersion({ id: '123', semVer: 'v2.1.3' });
+const packVersion2 = buildPackVersion({ id: '456', semVer: 'v2.1.0' });
+const packVersion3 = buildPackVersion({ id: '124', semVer: 'v2.0.0' });
+const packVersion4 = buildPackVersion({ id: '31231', semVer: 'v1.21.1' });
+const packVersion5 = buildPackVersion({ id: '3412', semVer: 'v1.21.0' });
 
 const availableVersions = [packVersion3, packVersion4, packVersion1, packVersion2, packVersion5];
 
