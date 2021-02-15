@@ -58,6 +58,7 @@ type Query {
   destination(id: ID!): Destination
   destinations: [Destination]
   generalSettings: GeneralSettings!
+  getAvailableLogSource(id: ID!): AvailableLogSource!
   getComplianceIntegration(id: ID!): ComplianceIntegration!
   getComplianceIntegrationTemplate(
     input: GetComplianceIntegrationTemplateInput!
@@ -74,10 +75,11 @@ type Query {
   policy(input: GetPolicyInput!): Policy
   policiesForResource(input: PoliciesForResourceInput): ListComplianceItemsResponse
   listAvailableLogTypes: ListAvailableLogTypesResponse!
+  listAvailableLogSources(input: ListAvailableLogSourcesInput): [AvailableLogSource!]!
   listComplianceIntegrations: [ComplianceIntegration!]!
   listDataModels(input: ListDataModelsInput!): ListDataModelsResponse!
   listLogIntegrations: [LogIntegration!]!
-  listPacks(input: ListPacksInput) : ListPacksResponse!
+  listPacks(input: ListPacksInput): ListPacksResponse!
   organizationStats(input: OrganizationStatsInput): OrganizationStatsResponse
   getLogAnalysisMetrics(input: LogAnalysisMetricsInput!): LogAnalysisMetricsResponse!
   rule(input: GetRuleInput!): Rule
@@ -85,6 +87,10 @@ type Query {
   users: [User!]!
   getCustomLog(input: GetCustomLogInput!): GetCustomLogOutput!
   listCustomLogs: [CustomLogRecord!]!
+}
+
+input ListAvailableLogSourcesInput {
+  category: String!
 }
 
 input ListPacksInput {
@@ -223,6 +229,30 @@ input GetAlertInput {
   alertId: ID!
   eventsPageSize: Int
   eventsExclusiveStartKey: String
+}
+
+type AvailableLogSourceParser {
+  name: String!
+  description: String
+  referenceUrl: String
+}
+
+type AvailableLogSourceDetails {
+  appInfo: String
+  howItWorks: String
+  useCases: String
+  defaultParsers: [String!]!
+  transports: [String!]!
+}
+
+type AvailableLogSource {
+  id: ID!
+  displayName: String!
+  popularity: Int!
+  categories: [String!]!
+  isEnterprise: Boolean!
+  availableParsers: [AvailableLogSourceParser!]!
+  details: AvailableLogSourceDetails
 }
 
 type ListDetectionsResponse {
@@ -529,7 +559,6 @@ type Pack {
   detectionTypes: DetectionTypes!
 }
 
-
 input SuppressPoliciesInput {
   policyIds: [ID]!
   resourcePatterns: [String]!
@@ -718,6 +747,7 @@ type S3LogIntegration {
   integrationId: ID!
   integrationType: String!
   integrationLabel: String!
+  logSourceId: ID
   lastEventReceived: AWSDateTime
   s3Bucket: String!
   s3Prefix: String
@@ -741,6 +771,7 @@ type SqsLogSourceIntegration {
   integrationLabel: String!
   integrationType: String!
   lastEventReceived: AWSDateTime
+  logSourceId: ID
   sqsConfig: SqsConfig!
   health: SqsLogIntegrationHealth!
 }
@@ -766,6 +797,7 @@ input AddS3LogIntegrationInput {
   kmsKey: String
   s3PrefixLogTypes: [S3PrefixLogTypesInput!]!
   managedBucketNotifications: Boolean!
+  logSourceId: ID
 }
 
 input SqsLogConfigInput {
@@ -777,6 +809,7 @@ input SqsLogConfigInput {
 input AddSqsLogIntegrationInput {
   integrationLabel: String!
   sqsConfig: SqsLogConfigInput!
+  logSourceId: ID
 }
 
 input UpdateComplianceIntegrationInput {
