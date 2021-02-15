@@ -335,8 +335,6 @@ func TestIntegrationAPI(t *testing.T) {
 		t.Run("SaveRuleInvalidTestInputJson", saveRuleInvalidTestInputJSON)
 
 		t.Run("TestFailCreatePolicyInvalidResourceType", testFailCreatePolicyInvalidResourceType)
-
-		t.Run("PollAnalysisPacks", pollPacks)
 	})
 	if t.Failed() {
 		return
@@ -350,7 +348,6 @@ func TestIntegrationAPI(t *testing.T) {
 		t.Run("GetRuleWrongType", getRuleWrongType)
 		t.Run("GetGlobal", getGlobal)
 		t.Run("GetDataModel", getDataModel)
-		t.Run("GetPack", getPack)
 	})
 
 	// NOTE! This will mutate the original policy above!
@@ -385,7 +382,6 @@ func TestIntegrationAPI(t *testing.T) {
 		t.Run("ListDetectionsComplianceProjection", listDetectionsComplianceProjection)
 		t.Run("ListDetectionsAnalysisTypeFilter", listDetectionsAnalysisTypeFilter)
 		t.Run("ListDetectionsComplianceFilter", listDetectionsComplianceFilter)
-		t.Run("ListPacks", listPacks)
 	})
 
 	t.Run("Modify", func(t *testing.T) {
@@ -410,7 +406,15 @@ func TestIntegrationAPI(t *testing.T) {
 
 	// This has to run after the other detection changes since it will
 	// add/remove/update detections
+	t.Run("PollPack", func(t *testing.T) {
+		t.Run("PollAnalysisPacks", pollPacks)
+	})
+	t.Run("ListPacks", func(t *testing.T) {
+		t.Run("GetPack", getPack)
+		t.Run("ListPacks", listPacks)
+	})
 	t.Run("Patch", func(t *testing.T) {
+		t.Run("ListPacks", listPacks)
 		t.Run("PatchPack", patchPack)
 		t.Run("EnumeratePack", enumeratePack)
 	})
@@ -3094,24 +3098,6 @@ func enumeratePack(t *testing.T) {
 	}
 	_, err = apiClient.Invoke(&input, &result)
 	assert.Error(t, err)
-	// First, have to enable to pack to get the detections in
-	var modifyResult models.Pack
-	modifyInput := models.LambdaInput{
-		PatchPack: &models.PatchPackInput{
-			ID:        packOriginalReleaseStandardSet.ID,
-			Enabled:   true,
-			VersionID: packOriginalReleaseStandardSet.PackVersion.ID,
-			UserID:    userID,
-		},
-	}
-	statusCode, err = apiClient.Invoke(&modifyInput, &modifyResult)
-	// update appropriate fields to compare
-	packOriginalReleaseStandardSet.Enabled = true
-	packOriginalReleaseStandardSet.LastModified = modifyResult.LastModified
-	packOriginalReleaseStandardSet.LastModifiedBy = userID
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, *packOriginalReleaseStandardSet, modifyResult)
 	// success: multi types
 	input = models.LambdaInput{
 		EnumeratePack: &models.EnumeratePackInput{
@@ -3149,10 +3135,9 @@ func patchPack(t *testing.T) {
 	// enable pack
 	input = models.LambdaInput{
 		PatchPack: &models.PatchPackInput{
-			ID:        packOriginalRelease.ID,
-			Enabled:   true,
-			VersionID: packOriginalRelease.PackVersion.ID,
-			UserID:    userID,
+			ID:      packOriginalRelease.ID,
+			Enabled: true,
+			UserID:  userID,
 		},
 	}
 	packOriginalRelease.Enabled = true
