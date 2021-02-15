@@ -65,7 +65,7 @@ const PackDetailsBanner: React.FC<ResourceDetailsInfoProps> = ({ pack }) => {
         title: `Updated Pack [${data.updatePack.id}] successfully`,
       });
     },
-    onError: error2 => {
+    onError: error => {
       trackError({
         event: TrackErrorEnum.FailedToUpdatePack,
         src: SrcEnum.Packs,
@@ -73,7 +73,7 @@ const PackDetailsBanner: React.FC<ResourceDetailsInfoProps> = ({ pack }) => {
       pushSnackbar({
         variant: 'error',
         title: `Failed to update Pack`,
-        description: extractErrorMessage(error2),
+        description: extractErrorMessage(error),
       });
     },
   });
