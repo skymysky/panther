@@ -3113,9 +3113,26 @@ func enumeratePack(t *testing.T) {
 }
 
 func patchPack(t *testing.T) {
-	// disable pack
+	// enable pack
 	var result models.Pack
 	input := models.LambdaInput{
+		PatchPack: &models.PatchPackInput{
+			ID:      packOriginalRelease.ID,
+			Enabled: true,
+			UserID:  userID,
+		},
+	}
+	packOriginalRelease.LastModifiedBy = userID
+	packOriginalRelease.Enabled = true
+	statusCode, err := apiClient.Invoke(&input, &result)
+	packOriginalRelease.LastModified = result.LastModified
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, statusCode)
+	assert.Equal(t, *packOriginalRelease, result)
+	// TODO: lookup detection in pack and ensure enabled:true
+
+	// disable pack
+	input = models.LambdaInput{
 		PatchPack: &models.PatchPackInput{
 			ID:        packOriginalRelease.ID,
 			Enabled:   false,
@@ -3123,30 +3140,13 @@ func patchPack(t *testing.T) {
 			UserID:    userID,
 		},
 	}
-	packOriginalRelease.LastModifiedBy = userID
 	packOriginalRelease.Enabled = false
-	statusCode, err := apiClient.Invoke(&input, &result)
-	packOriginalRelease.LastModified = result.LastModified
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, *packOriginalRelease, result)
-	// TODO: lookup detection in pack and ensure enabled: false
-
-	// enable pack
-	input = models.LambdaInput{
-		PatchPack: &models.PatchPackInput{
-			ID:      packOriginalRelease.ID,
-			Enabled: true,
-			UserID:  userID,
-		},
-	}
-	packOriginalRelease.Enabled = true
 	statusCode, err = apiClient.Invoke(&input, &result)
 	packOriginalRelease.LastModified = result.LastModified
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, statusCode)
 	assert.Equal(t, *packOriginalRelease, result)
-	// TODO: lookup detection in pack and ensure enabled:true
+	// TODO: lookup detection in pack and ensure enabled: false
 
 	/*TODO
 	// upgrade to newer well known version (v1.15.0) TODO
