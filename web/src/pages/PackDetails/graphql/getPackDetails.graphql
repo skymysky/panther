@@ -1,0 +1,5 @@
+query GetPackDetails($id: ID!) {
+  pack(id: $id) {
+    ...PackDetails
+  }
+}

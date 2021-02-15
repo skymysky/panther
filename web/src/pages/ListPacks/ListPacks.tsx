@@ -38,25 +38,22 @@ import { PageViewEnum } from 'Helpers/analytics';
 import Panel from 'Components/Panel';
 import { TableControlsPagination } from 'Components/utils/TableControls';
 import useRequestParamsWithPagination from 'Hooks/useRequestParamsWithPagination';
-import mockedData from 'Pages/ListPacks/mockedData';
 import PackCard from 'Components/cards/PackCard';
+import { DEFAULT_SMALL_PAGE_SIZE } from 'Source/constants';
+import { useListPacks } from 'Pages/ListPacks/graphql/listPacks.generated';
+import ListPacksFilters from './ListPacksFilters';
 import ListPacksSkeleton from './Skeleton';
-import { buildListPacksResponse } from '../../../__tests__/__mocks__/builders.generated';
 
 const ListPacks = () => {
   useTrackPageView(PageViewEnum.ListPacks);
-  const { updatePagingParams } = useRequestParamsWithPagination<ListPacksInput>();
+  const { updatePagingParams, requestParams } = useRequestParamsWithPagination<ListPacksInput>();
 
-  // FIXME: Waiting for BE to implement this request
-  // const { loading, error, data } = useListPacks({
-  //   fetchPolicy: 'cache-and-network',
-  //   variables: {
-  //     input: { ...requestParams, pageSize: DEFAULT_SMALL_PAGE_SIZE },
-  //   },
-  // });
-  const loading = false;
-  const error = null;
-  const data = { listPacks: buildListPacksResponse({ packs: mockedData.packs }) };
+  const { loading, error, data } = useListPacks({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      input: { ...requestParams, pageSize: DEFAULT_SMALL_PAGE_SIZE },
+    },
+  });
 
   if (loading && !data) {
     return <ListPacksSkeleton />;
@@ -83,7 +80,7 @@ const ListPacks = () => {
 
   return (
     <ErrorBoundary>
-      <Panel title="Packs">
+      <Panel title="Packs" actions={<ListPacksFilters />}>
         <Card as="section" position="relative">
           <Box position="relative">
             <Flex direction="column" spacing={2}>

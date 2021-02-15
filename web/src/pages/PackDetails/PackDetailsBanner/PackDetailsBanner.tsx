@@ -17,28 +17,23 @@
  */
 
 import React from 'react';
-import GenericItemCard from 'Components/GenericItemCard';
-import { Box, Card, Flex, Link, Switch, Text, useSnackbar } from 'pouncejs';
-import { Link as RRLink } from 'react-router-dom';
-import urls from 'Source/urls';
+import { Box, Flex, Card, Heading, Switch, useSnackbar, Text } from 'pouncejs';
+import { PackDetails } from 'Source/graphql/fragments/PackDetails.generated';
 import UpdateVersion, { UpdateVersionFormValues } from 'Components/cards/PackCard/UpdateVersion';
 import { useUpdatePack } from 'Source/graphql/queries';
 import { EventEnum, SrcEnum, trackError, TrackErrorEnum, trackEvent } from 'Helpers/analytics';
 import { extractErrorMessage } from 'Helpers/utils';
 import BulletedLoading from 'Components/BulletedLoading';
-import { DETECTION_TYPE_COLOR_MAP } from 'Source/constants';
-import { PackDetails } from 'Source/graphql/fragments/PackDetails.generated';
-import FlatBadge from 'Components/badges/FlatBadge';
 
-interface PackCardProps {
-  pack: PackDetails;
+interface ResourceDetailsInfoProps {
+  pack?: PackDetails;
 }
 
-const PackCard: React.FC<PackCardProps> = ({ pack }) => {
+const PackDetailsBanner: React.FC<ResourceDetailsInfoProps> = ({ pack }) => {
   const { pushSnackbar } = useSnackbar();
 
   const [updatePack, { loading }] = useUpdatePack({
-    // This hook ensures we also update the PackDetails item in the cache
+    // This hook ensures we also update the AlertDetails item in the cache
     update: (cache, { data }) => {
       const dataId = cache.identify({
         __typename: 'PackDetails',
@@ -70,7 +65,7 @@ const PackCard: React.FC<PackCardProps> = ({ pack }) => {
         title: `Updated Pack [${data.updatePack.id}] successfully`,
       });
     },
-    onError: error => {
+    onError: error2 => {
       trackError({
         event: TrackErrorEnum.FailedToUpdatePack,
         src: SrcEnum.Packs,
@@ -78,7 +73,7 @@ const PackCard: React.FC<PackCardProps> = ({ pack }) => {
       pushSnackbar({
         variant: 'error',
         title: `Failed to update Pack`,
-        description: extractErrorMessage(error),
+        description: extractErrorMessage(error2),
       });
     },
   });
@@ -104,40 +99,46 @@ const PackCard: React.FC<PackCardProps> = ({ pack }) => {
       },
     });
   };
+
   return (
-    // Replaced GenericItemCard with simple card in order to exclude overflow property
-    <Card as="section" variant="dark" position="relative">
-      {loading && (
-        <Flex
-          position="absolute"
-          direction="column"
-          spacing={2}
-          backgroundColor="navyblue-700"
-          height="100%"
-          zIndex={2}
-          alignItems="center"
-          opacity={0.9}
-          justify="center"
-          width={1}
-        >
-          <Text textAlign="center" opacity={1} fontWeight="bold">
-            {pack.displayName || pack.id}
-          </Text>
-          <Text textAlign="center" opacity={1}>
-            is being updated, please wait.
-          </Text>
-          <BulletedLoading />
-        </Flex>
-      )}
-      <Flex position="relative" height="100%" p={4}>
-        <GenericItemCard.Body>
-          <GenericItemCard.Header>
-            <GenericItemCard.Heading>
-              <Link as={RRLink} aria-label="Link to Pack" to={urls.packs.details(pack.id)}>
+    <React.Fragment>
+      <Card as="article" position="relative">
+        {loading && (
+          <Flex
+            position="absolute"
+            direction="column"
+            spacing={2}
+            backgroundColor="navyblue-700"
+            height="100%"
+            zIndex={2}
+            alignItems="center"
+            opacity={0.9}
+            justify="center"
+            width={1}
+          >
+            <Text textAlign="center" opacity={1} fontWeight="bold">
+              {pack.displayName || pack.id}
+            </Text>
+            <Text textAlign="center" opacity={1}>
+              is being updated, please wait.
+            </Text>
+            <BulletedLoading />
+          </Flex>
+        )}
+        <Flex p={6}>
+          <Box>
+            <Flex as="header" align="center">
+              <Heading
+                fontWeight="bold"
+                wordBreak="break-word"
+                aria-describedby="rule-description"
+                flexShrink={1}
+                display="flex"
+                alignItems="center"
+                mr={4}
+              >
                 {pack.displayName || pack.id}
-              </Link>
-            </GenericItemCard.Heading>
-            <Flex spacing={2} fontSize="small" alignItems="center">
+              </Heading>
               {pack.updateAvailable && (
                 <Box
                   as="span"
@@ -145,52 +146,29 @@ const PackCard: React.FC<PackCardProps> = ({ pack }) => {
                   borderRadius="small"
                   px={2}
                   py={1}
+                  fontSize="small"
                   fontWeight="bold"
                 >
                   UPDATE AVAILABLE
                 </Box>
               )}
             </Flex>
-          </GenericItemCard.Header>
-          <Flex spacing={2}>
-            {pack.packTypes.RULE && (
-              <FlatBadge color={DETECTION_TYPE_COLOR_MAP.RULE}>
-                {pack.packTypes.RULE} RULES
-              </FlatBadge>
-            )}
-            {pack.packTypes.POLICY && (
-              <FlatBadge color={DETECTION_TYPE_COLOR_MAP.POLICY}>
-                {pack.packTypes.RULE} POLICIES
-              </FlatBadge>
-            )}
-            {pack.packTypes.GLOBAL && (
-              <FlatBadge color={DETECTION_TYPE_COLOR_MAP.GLOBAL}>
-                {pack.packTypes.GLOBAL} HELPERS
-              </FlatBadge>
-            )}
-            {pack.packTypes.DATAMODEL && (
-              <FlatBadge color={DETECTION_TYPE_COLOR_MAP.GLOBAL}>
-                {pack.packTypes.DATAMODEL} DATA MODELS
-              </FlatBadge>
-            )}
-          </Flex>
-          <GenericItemCard.ValuesGroup>
-            <Flex width={1} mt={3}>
-              <Box width={0.6}>
-                <GenericItemCard.Value label="Pack Description" value={pack.description} />
-              </Box>
-              <Box width="250px">
-                <UpdateVersion pack={pack} onPatch={onPatch} />
-              </Box>
-              <Flex ml="auto" mr={0} align="flex-end">
-                <Switch onClick={onStatusUpdate} label="Enabled" checked={pack.enabled} />
-              </Flex>
+            <Flex as="dl" fontSize="medium" pt={2} spacing={8} wrap="wrap">
+              {pack.description}
             </Flex>
-          </GenericItemCard.ValuesGroup>
-        </GenericItemCard.Body>
-      </Flex>
-    </Card>
+          </Box>
+          <Flex align="center" spacing={8} flexShrink={0} ml="auto">
+            <Flex ml="auto" mr={0} align="flex-end">
+              <Switch onClick={onStatusUpdate} label="Enabled" checked={pack.enabled} />
+            </Flex>
+            <Box width="250px">
+              <UpdateVersion pack={pack} onPatch={onPatch} />
+            </Box>
+          </Flex>
+        </Flex>
+      </Card>
+    </React.Fragment>
   );
 };
 
-export default React.memo(PackCard);
+export default React.memo(PackDetailsBanner);

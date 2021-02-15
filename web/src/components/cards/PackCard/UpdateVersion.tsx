@@ -27,17 +27,20 @@ interface UpdateVersionProps {
 
 export interface UpdateVersionFormValues {
   packVersion: {
-    id: string;
-    name: string;
+    id: number;
+    semVer: string;
   };
 }
+
+const versionToString = v => v.semVer;
 
 const UpdateVersion: React.FC<UpdateVersionProps> = ({
   pack: { enabled, availableVersions, packVersion: current },
   onPatch,
 }) => {
-  availableVersions.sort((a, b) => compareSemanticVersion(b.name, a.name));
-  const [selectedVersion, setSelectedVersion] = React.useState<PackVersion>(availableVersions[0]);
+  const sortedVersions = [...availableVersions];
+  sortedVersions.sort((a, b) => compareSemanticVersion(b.semVer, a.semVer));
+  const [selectedVersion, setSelectedVersion] = React.useState<PackVersion>(sortedVersions[0]);
 
   return (
     <Flex spacing={4}>
@@ -47,14 +50,14 @@ const UpdateVersion: React.FC<UpdateVersionProps> = ({
           value={selectedVersion}
           disabled={!enabled}
           onChange={setSelectedVersion}
-          items={availableVersions}
-          itemToString={v => v.name}
+          items={sortedVersions}
+          itemToString={versionToString}
         />
       </Box>
       <Box width={130}>
-        {compareSemanticVersion(selectedVersion.name, current.name) >= 0 ? (
+        {compareSemanticVersion(selectedVersion.semVer, current.semVer) >= 0 ? (
           <Button
-            disabled={!enabled || selectedVersion.name === current.name}
+            disabled={!enabled || selectedVersion.semVer === current.semVer}
             onClick={() => onPatch({ packVersion: selectedVersion })}
           >
             Update Pack
@@ -62,7 +65,7 @@ const UpdateVersion: React.FC<UpdateVersionProps> = ({
         ) : (
           <Button
             variantColor="violet"
-            disabled={!enabled || selectedVersion.name === current.name}
+            disabled={!enabled || selectedVersion.semVer === current.semVer}
             onClick={() => onPatch({ packVersion: selectedVersion })}
           >
             Revert Pack
