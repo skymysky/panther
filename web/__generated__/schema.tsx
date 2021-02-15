@@ -1087,6 +1087,14 @@ export type PackDefinition = {
   IDs?: Maybe<Array<Scalars['ID']>>;
 };
 
+export type PackEnumeration = {
+  __typename?: 'PackEnumeration';
+  paging: PagingData;
+  detections: Array<Detection>;
+  models: Array<DataModel>;
+  globals: Array<GlobalPythonModule>;
+};
+
 export type PackTypes = {
   __typename?: 'PackTypes';
   GLOBAL?: Maybe<Scalars['Int']>;
@@ -1188,6 +1196,7 @@ export type Query = {
   getLogAnalysisMetrics: LogAnalysisMetricsResponse;
   rule?: Maybe<Rule>;
   pack: Pack;
+  enumeratePack: PackEnumeration;
   listGlobalPythonModules: ListGlobalPythonModulesResponse;
   users: Array<User>;
   getCustomLog: GetCustomLogOutput;
@@ -1283,6 +1292,10 @@ export type QueryRuleArgs = {
 };
 
 export type QueryPackArgs = {
+  id: Scalars['ID'];
+};
+
+export type QueryEnumeratePackArgs = {
   id: Scalars['ID'];
 };
 
@@ -1874,6 +1887,7 @@ export type ResolversTypes = {
   SingleValue: ResolverTypeWrapper<SingleValue>;
   GetRuleInput: GetRuleInput;
   Rule: ResolverTypeWrapper<Rule>;
+  PackEnumeration: ResolverTypeWrapper<PackEnumeration>;
   ListGlobalPythonModuleInput: ListGlobalPythonModuleInput;
   ListGlobalPythonModulesResponse: ResolverTypeWrapper<ListGlobalPythonModulesResponse>;
   User: ResolverTypeWrapper<User>;
@@ -2066,6 +2080,7 @@ export type ResolversParentTypes = {
   SingleValue: SingleValue;
   GetRuleInput: GetRuleInput;
   Rule: Rule;
+  PackEnumeration: PackEnumeration;
   ListGlobalPythonModuleInput: ListGlobalPythonModuleInput;
   ListGlobalPythonModulesResponse: ListGlobalPythonModulesResponse;
   User: User;
@@ -3055,6 +3070,17 @@ export type PackDefinitionResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
+export type PackEnumerationResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PackEnumeration'] = ResolversParentTypes['PackEnumeration']
+> = {
+  paging?: Resolver<ResolversTypes['PagingData'], ParentType, ContextType>;
+  detections?: Resolver<Array<ResolversTypes['Detection']>, ParentType, ContextType>;
+  models?: Resolver<Array<ResolversTypes['DataModel']>, ParentType, ContextType>;
+  globals?: Resolver<Array<ResolversTypes['GlobalPythonModule']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+};
+
 export type PackTypesResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['PackTypes'] = ResolversParentTypes['PackTypes']
@@ -3285,6 +3311,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryPackArgs, 'id'>
+  >;
+  enumeratePack?: Resolver<
+    ResolversTypes['PackEnumeration'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryEnumeratePackArgs, 'id'>
   >;
   listGlobalPythonModules?: Resolver<
     ResolversTypes['ListGlobalPythonModulesResponse'],
@@ -3727,6 +3759,7 @@ export type Resolvers<ContextType = any> = {
   OrganizationStatsResponse?: OrganizationStatsResponseResolvers<ContextType>;
   Pack?: PackResolvers<ContextType>;
   PackDefinition?: PackDefinitionResolvers<ContextType>;
+  PackEnumeration?: PackEnumerationResolvers<ContextType>;
   PackTypes?: PackTypesResolvers<ContextType>;
   PackVersion?: PackVersionResolvers<ContextType>;
   PagerDutyConfig?: PagerDutyConfigResolvers<ContextType>;

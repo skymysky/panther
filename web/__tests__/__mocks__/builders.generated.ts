@@ -109,6 +109,7 @@ import {
   OrganizationStatsResponse,
   Pack,
   PackDefinition,
+  PackEnumeration,
   PackTypes,
   PackVersion,
   PackVersionInput,
@@ -1334,6 +1335,16 @@ export const buildPackDefinition = (overrides: Partial<PackDefinition> = {}): Pa
   return {
     __typename: 'PackDefinition',
     IDs: 'IDs' in overrides ? overrides.IDs : ['292ec670-686c-4d3a-b015-fc202b83bf9d'],
+  };
+};
+
+export const buildPackEnumeration = (overrides: Partial<PackEnumeration> = {}): PackEnumeration => {
+  return {
+    __typename: 'PackEnumeration',
+    paging: 'paging' in overrides ? overrides.paging : buildPagingData(),
+    detections: 'detections' in overrides ? overrides.detections : [buildDetection()],
+    models: 'models' in overrides ? overrides.models : [buildDataModel()],
+    globals: 'globals' in overrides ? overrides.globals : [buildGlobalPythonModule()],
   };
 };
 

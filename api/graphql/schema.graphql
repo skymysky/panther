@@ -82,6 +82,7 @@ type Query {
   getLogAnalysisMetrics(input: LogAnalysisMetricsInput!): LogAnalysisMetricsResponse!
   rule(input: GetRuleInput!): Rule
   pack(id: ID!): Pack!
+  enumeratePack(id: ID!): PackEnumeration!
   listGlobalPythonModules(input: ListGlobalPythonModuleInput!): ListGlobalPythonModulesResponse!
   users: [User!]!
   getCustomLog(input: GetCustomLogInput!): GetCustomLogOutput!
@@ -531,6 +532,12 @@ type Pack {
   packTypes: PackTypes!
 }
 
+type PackEnumeration {
+  paging: PagingData!
+  detections: [Detection!]!
+  models: [DataModel!]!
+  globals: [GlobalPythonModule!]!
+}
 
 input SuppressPoliciesInput {
   policyIds: [ID]!
