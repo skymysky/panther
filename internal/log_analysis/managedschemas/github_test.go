@@ -1,3 +1,5 @@
+package managedschemas
+
 /**
  * Panther is a Cloud-Native SIEM for the Modern Security Team.
  * Copyright (C) 2020 Panther Labs Inc
@@ -16,33 +18,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { Box, Theme } from 'pouncejs';
+import (
+	"context"
+	"testing"
 
-interface FlatBadgeProps {
-  children: React.ReactNode;
-  backgroundColor?: keyof Theme['colors'];
-  color?: keyof Theme['colors'];
+	"github.com/google/go-github/github"
+	"github.com/stretchr/testify/require"
+)
+
+func TestGitHubRepository_ReleaseFeed(t *testing.T) {
+	// Skip until we can mock http client for github
+	t.Skip()
+
+	assert := require.New(t)
+	repo := GitHubRepository{
+		Repo:   "panther-analysis",
+		Owner:  "panther-labs",
+		Client: github.NewClient(nil),
+	}
+	feed, err := repo.ReleaseFeed(context.Background(), "v0.0.0")
+	assert.NoError(err)
+	assert.NotEmpty(feed)
 }
-
-const FlatBadge: React.FC<FlatBadgeProps> = ({
-  backgroundColor = 'navyblue-700',
-  color = 'white',
-  children,
-}) => {
-  return (
-    <Box
-      backgroundColor={backgroundColor}
-      borderRadius="small"
-      px="6px"
-      py={1}
-      fontWeight="bold"
-      fontSize="x-small"
-      color={color}
-    >
-      {children}
-    </Box>
-  );
-};
-
-export default FlatBadge;

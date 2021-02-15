@@ -16,33 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { Box, Theme } from 'pouncejs';
+const Sequencer = require('@jest/test-sequencer').default;
 
-interface FlatBadgeProps {
-  children: React.ReactNode;
-  backgroundColor?: keyof Theme['colors'];
-  color?: keyof Theme['colors'];
+/* eslint-disable */
+class CustomSequencer extends Sequencer {
+  sort(tests) {
+    if (process.env.CIRCLE_NODE_TOTAL) {
+      // In CI, parallelize tests across multiple tasks.
+      const nodeTotal = parseInt(process.env.CIRCLE_NODE_TOTAL, 10);
+      const nodeIndex = parseInt(process.env.CIRCLE_NODE_INDEX, 10);
+      tests = tests
+        .sort((a, b) => (a.path < b.path ? -1 : 1))
+        .filter((_, i) => i % nodeTotal === nodeIndex);
+    }
+    return tests;
+  }
 }
 
-const FlatBadge: React.FC<FlatBadgeProps> = ({
-  backgroundColor = 'navyblue-700',
-  color = 'white',
-  children,
-}) => {
-  return (
-    <Box
-      backgroundColor={backgroundColor}
-      borderRadius="small"
-      px="6px"
-      py={1}
-      fontWeight="bold"
-      fontSize="x-small"
-      color={color}
-    >
-      {children}
-    </Box>
-  );
-};
+/* eslint-enable */
 
-export default FlatBadge;
+module.exports = CustomSequencer;
