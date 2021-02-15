@@ -81,6 +81,7 @@ type Query {
   organizationStats(input: OrganizationStatsInput): OrganizationStatsResponse
   getLogAnalysisMetrics(input: LogAnalysisMetricsInput!): LogAnalysisMetricsResponse!
   rule(input: GetRuleInput!): Rule
+  pack(id: ID!): Pack!
   listGlobalPythonModules(input: ListGlobalPythonModuleInput!): ListGlobalPythonModulesResponse!
   users: [User!]!
   getCustomLog(input: GetCustomLogInput!): GetCustomLogOutput!

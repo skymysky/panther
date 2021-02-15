@@ -1320,6 +1320,61 @@ Resources:
         }
       ResponseMappingTemplate: !FindInMap [ResponseTemplates, LambdaStatusCodeNoBody, VTL]
 
+  GetPackResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      TypeName: Query
+      FieldName: pack
+      DataSourceName: !GetAtt AnalysisAPILambdaDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation": "Invoke",
+          "payload": $util.toJson({
+            "getPack": {
+              "id": $ctx.args.id
+            }
+          })
+        }
+      ResponseMappingTemplate: !FindInMap [ResponseTemplates, LambdaStatusCode, VTL]
+
+  UpdatePackResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      TypeName: Mutation
+      FieldName: updatePack
+      DataSourceName: !GetAtt AnalysisAPILambdaDataSource.Name
+      RequestMappingTemplate: |
+        #set ($input = $ctx.args.input)
+        $util.qr($input.put("userId", $ctx.identity.username))
+        {
+          "version" : "2017-02-28",
+          "operation": "Invoke",
+          "payload": $util.toJson({
+            "updatePack": $input
+          })
+        }
+      ResponseMappingTemplate: !FindInMap [ResponseTemplates, LambdaStatusCode, VTL]
+
+  ListPacksResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !Ref ApiId
+      TypeName: Query
+      FieldName: listPacks
+      DataSourceName: !GetAtt AnalysisAPILambdaDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation": "Invoke",
+          "payload": $util.toJson({
+            "listPacks": $util.defaultIfNull($ctx.args.input, {})
+          })
+        }
+      ResponseMappingTemplate: !FindInMap [ResponseTemplates, LambdaStatusCode, VTL]
+
   SendTestAlertResolver:
     Type: AWS::AppSync::Resolver
     Properties:

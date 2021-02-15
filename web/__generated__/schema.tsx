@@ -1186,6 +1186,7 @@ export type Query = {
   organizationStats?: Maybe<OrganizationStatsResponse>;
   getLogAnalysisMetrics: LogAnalysisMetricsResponse;
   rule?: Maybe<Rule>;
+  pack: Pack;
   listGlobalPythonModules: ListGlobalPythonModulesResponse;
   users: Array<User>;
   getCustomLog: GetCustomLogOutput;
@@ -1278,6 +1279,10 @@ export type QueryGetLogAnalysisMetricsArgs = {
 
 export type QueryRuleArgs = {
   input: GetRuleInput;
+};
+
+export type QueryPackArgs = {
+  id: Scalars['ID'];
 };
 
 export type QueryListGlobalPythonModulesArgs = {
@@ -3272,6 +3277,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryRuleArgs, 'input'>
+  >;
+  pack?: Resolver<
+    ResolversTypes['Pack'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryPackArgs, 'id'>
   >;
   listGlobalPythonModules?: Resolver<
     ResolversTypes['ListGlobalPythonModulesResponse'],
