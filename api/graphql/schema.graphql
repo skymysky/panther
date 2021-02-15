@@ -499,14 +499,15 @@ type PackVersion {
   semVer: String!
 }
 
-type PackDetectionsPatterns {
+type PackDefinition {
   # This is an array Detection['id'] that are related to the pack
   IDs: [ID!]
 }
 
-type DetectionTypes {
+type PackTypes {
   GLOBAL: Int!
   RULE: Int!
+  DATAMODEL: Int!
   POLICY: Int!
 }
 
@@ -526,8 +527,8 @@ type Pack {
   createdAt: AWSDateTime!
   lastModified: AWSDateTime!
 
-  detectionsPatterns: PackDetectionsPatterns!
-  detectionTypes: DetectionTypes!
+  packDefinition: PackDefinition!
+  packTypes: PackTypes!
 }
 
 

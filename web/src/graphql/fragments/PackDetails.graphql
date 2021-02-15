@@ -14,12 +14,13 @@ fragment PackDetails on Pack {
         id
         semVer
     }
-    detectionTypes {
+    packTypes {
         GLOBAL
         POLICY
         RULE
+        DATAMODEL
     }
-    detectionsPatterns {
+    packDefinition {
         IDs
     }
 

@@ -60,7 +60,6 @@ import {
   Detection,
   DetectionTestDefinition,
   DetectionTestDefinitionInput,
-  DetectionTypes,
   Error,
   FloatSeries,
   FloatSeriesData,
@@ -109,7 +108,8 @@ import {
   OrganizationStatsInput,
   OrganizationStatsResponse,
   Pack,
-  PackDetectionsPatterns,
+  PackDefinition,
+  PackTypes,
   PackVersion,
   PackVersionInput,
   PagerDutyConfig,
@@ -778,15 +778,6 @@ export const buildDetectionTestDefinitionInput = (
   };
 };
 
-export const buildDetectionTypes = (overrides: Partial<DetectionTypes> = {}): DetectionTypes => {
-  return {
-    __typename: 'DetectionTypes',
-    GLOBAL: 'GLOBAL' in overrides ? overrides.GLOBAL : 675,
-    RULE: 'RULE' in overrides ? overrides.RULE : 48,
-    POLICY: 'POLICY' in overrides ? overrides.POLICY : 936,
-  };
-};
-
 export const buildError = (overrides: Partial<Error> = {}): Error => {
   return {
     __typename: 'Error',
@@ -1333,21 +1324,26 @@ export const buildPack = (overrides: Partial<Pack> = {}): Pack => {
         : '0784eeea-c28c-4ad9-afeb-4be7ea05ee08',
     createdAt: 'createdAt' in overrides ? overrides.createdAt : '2020-03-12T10:42:13.067Z',
     lastModified: 'lastModified' in overrides ? overrides.lastModified : '2020-01-13T14:33:23.011Z',
-    detectionsPatterns:
-      'detectionsPatterns' in overrides
-        ? overrides.detectionsPatterns
-        : buildPackDetectionsPatterns(),
-    detectionTypes:
-      'detectionTypes' in overrides ? overrides.detectionTypes : buildDetectionTypes(),
+    packDefinition:
+      'packDefinition' in overrides ? overrides.packDefinition : buildPackDefinition(),
+    packTypes: 'packTypes' in overrides ? overrides.packTypes : buildPackTypes(),
   };
 };
 
-export const buildPackDetectionsPatterns = (
-  overrides: Partial<PackDetectionsPatterns> = {}
-): PackDetectionsPatterns => {
+export const buildPackDefinition = (overrides: Partial<PackDefinition> = {}): PackDefinition => {
   return {
-    __typename: 'PackDetectionsPatterns',
-    IDs: 'IDs' in overrides ? overrides.IDs : ['29535cdd-7ce3-4006-a706-e502d29c7601'],
+    __typename: 'PackDefinition',
+    IDs: 'IDs' in overrides ? overrides.IDs : ['292ec670-686c-4d3a-b015-fc202b83bf9d'],
+  };
+};
+
+export const buildPackTypes = (overrides: Partial<PackTypes> = {}): PackTypes => {
+  return {
+    __typename: 'PackTypes',
+    GLOBAL: 'GLOBAL' in overrides ? overrides.GLOBAL : 691,
+    RULE: 'RULE' in overrides ? overrides.RULE : 622,
+    DATAMODEL: 'DATAMODEL' in overrides ? overrides.DATAMODEL : 545,
+    POLICY: 'POLICY' in overrides ? overrides.POLICY : 184,
   };
 };
 

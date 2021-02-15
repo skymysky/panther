@@ -465,13 +465,6 @@ export enum DetectionTypeEnum {
   Policy = 'POLICY',
 }
 
-export type DetectionTypes = {
-  __typename?: 'DetectionTypes';
-  GLOBAL: Scalars['Int'];
-  RULE: Scalars['Int'];
-  POLICY: Scalars['Int'];
-};
-
 export type Error = {
   __typename?: 'Error';
   code?: Maybe<Scalars['String']>;
@@ -1085,13 +1078,21 @@ export type Pack = {
   lastModifiedBy: Scalars['ID'];
   createdAt: Scalars['AWSDateTime'];
   lastModified: Scalars['AWSDateTime'];
-  detectionsPatterns: PackDetectionsPatterns;
-  detectionTypes: DetectionTypes;
+  packDefinition: PackDefinition;
+  packTypes: PackTypes;
 };
 
-export type PackDetectionsPatterns = {
-  __typename?: 'PackDetectionsPatterns';
+export type PackDefinition = {
+  __typename?: 'PackDefinition';
   IDs?: Maybe<Array<Scalars['ID']>>;
+};
+
+export type PackTypes = {
+  __typename?: 'PackTypes';
+  GLOBAL: Scalars['Int'];
+  RULE: Scalars['Int'];
+  DATAMODEL: Scalars['Int'];
+  POLICY: Scalars['Int'];
 };
 
 export type PackVersion = {
@@ -1858,8 +1859,8 @@ export type ResolversTypes = {
   ListPacksResponse: ResolverTypeWrapper<ListPacksResponse>;
   Pack: ResolverTypeWrapper<Pack>;
   PackVersion: ResolverTypeWrapper<PackVersion>;
-  PackDetectionsPatterns: ResolverTypeWrapper<PackDetectionsPatterns>;
-  DetectionTypes: ResolverTypeWrapper<DetectionTypes>;
+  PackDefinition: ResolverTypeWrapper<PackDefinition>;
+  PackTypes: ResolverTypeWrapper<PackTypes>;
   OrganizationStatsInput: OrganizationStatsInput;
   OrganizationStatsResponse: ResolverTypeWrapper<OrganizationStatsResponse>;
   OrganizationReportBySeverity: ResolverTypeWrapper<OrganizationReportBySeverity>;
@@ -2050,8 +2051,8 @@ export type ResolversParentTypes = {
   ListPacksResponse: ListPacksResponse;
   Pack: Pack;
   PackVersion: PackVersion;
-  PackDetectionsPatterns: PackDetectionsPatterns;
-  DetectionTypes: DetectionTypes;
+  PackDefinition: PackDefinition;
+  PackTypes: PackTypes;
   OrganizationStatsInput: OrganizationStatsInput;
   OrganizationStatsResponse: OrganizationStatsResponse;
   OrganizationReportBySeverity: OrganizationReportBySeverity;
@@ -2516,16 +2517,6 @@ export type DetectionTestDefinitionResolvers<
   expectedResult?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   resource?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
-};
-
-export type DetectionTypesResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['DetectionTypes'] = ResolversParentTypes['DetectionTypes']
-> = {
-  GLOBAL?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  RULE?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  POLICY?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
@@ -3051,16 +3042,27 @@ export type PackResolvers<
   lastModifiedBy?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['AWSDateTime'], ParentType, ContextType>;
   lastModified?: Resolver<ResolversTypes['AWSDateTime'], ParentType, ContextType>;
-  detectionsPatterns?: Resolver<ResolversTypes['PackDetectionsPatterns'], ParentType, ContextType>;
-  detectionTypes?: Resolver<ResolversTypes['DetectionTypes'], ParentType, ContextType>;
+  packDefinition?: Resolver<ResolversTypes['PackDefinition'], ParentType, ContextType>;
+  packTypes?: Resolver<ResolversTypes['PackTypes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
-export type PackDetectionsPatternsResolvers<
+export type PackDefinitionResolvers<
   ContextType = any,
-  ParentType extends ResolversParentTypes['PackDetectionsPatterns'] = ResolversParentTypes['PackDetectionsPatterns']
+  ParentType extends ResolversParentTypes['PackDefinition'] = ResolversParentTypes['PackDefinition']
 > = {
   IDs?: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>;
+};
+
+export type PackTypesResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PackTypes'] = ResolversParentTypes['PackTypes']
+> = {
+  GLOBAL?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  RULE?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  DATAMODEL?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  POLICY?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
@@ -3695,7 +3697,6 @@ export type Resolvers<ContextType = any> = {
   DestinationConfig?: DestinationConfigResolvers<ContextType>;
   Detection?: DetectionResolvers;
   DetectionTestDefinition?: DetectionTestDefinitionResolvers<ContextType>;
-  DetectionTypes?: DetectionTypesResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
   FloatSeries?: FloatSeriesResolvers<ContextType>;
   FloatSeriesData?: FloatSeriesDataResolvers<ContextType>;
@@ -3725,7 +3726,8 @@ export type Resolvers<ContextType = any> = {
   OrganizationReportBySeverity?: OrganizationReportBySeverityResolvers<ContextType>;
   OrganizationStatsResponse?: OrganizationStatsResponseResolvers<ContextType>;
   Pack?: PackResolvers<ContextType>;
-  PackDetectionsPatterns?: PackDetectionsPatternsResolvers<ContextType>;
+  PackDefinition?: PackDefinitionResolvers<ContextType>;
+  PackTypes?: PackTypesResolvers<ContextType>;
   PackVersion?: PackVersionResolvers<ContextType>;
   PagerDutyConfig?: PagerDutyConfigResolvers<ContextType>;
   PagingData?: PagingDataResolvers<ContextType>;

@@ -35,8 +35,8 @@ export type PackDetails = Pick<
 > & {
   packVersion: Pick<Types.PackVersion, 'id' | 'semVer'>;
   availableVersions: Array<Pick<Types.PackVersion, 'id' | 'semVer'>>;
-  detectionTypes: Pick<Types.DetectionTypes, 'GLOBAL' | 'POLICY' | 'RULE'>;
-  detectionsPatterns: Pick<Types.PackDetectionsPatterns, 'IDs'>;
+  packTypes: Pick<Types.PackTypes, 'GLOBAL' | 'POLICY' | 'RULE' | 'DATAMODEL'>;
+  packDefinition: Pick<Types.PackDefinition, 'IDs'>;
 };
 
 export const PackDetails = gql`
@@ -54,12 +54,13 @@ export const PackDetails = gql`
       id
       semVer
     }
-    detectionTypes {
+    packTypes {
       GLOBAL
       POLICY
       RULE
+      DATAMODEL
     }
-    detectionsPatterns {
+    packDefinition {
       IDs
     }
     lastModified
