@@ -18,10 +18,10 @@ from collections.abc import Mapping
 from typing import Any, Optional
 
 from .data_model import DataModel
-from .immutable import ImmutableDict, json_encoder
+from .immutable import ImmutableCaseInsensitiveDict, json_encoder
 
 
-class PantherEvent(ImmutableDict):  # pylint: disable=R0901
+class PantherEvent(ImmutableCaseInsensitiveDict):  # pylint: disable=R0901
     """Panther enriched event with unified data model (udm) access."""
 
     def __init__(self, event: Mapping, data_model: Optional[DataModel]):

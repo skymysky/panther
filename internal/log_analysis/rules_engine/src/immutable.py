@@ -16,7 +16,8 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
-from typing import Any, Dict, Iterator, Type, no_type_check
+from typing import Any, Dict, Iterator, Type, \
+    Union, Collection, no_type_check
 
 
 class ImmutableContainerMixin(ABC):
@@ -67,8 +68,15 @@ class ImmutableContainerMixin(ABC):
         return iter(self._container)
 
 
-class ImmutableDict(ImmutableContainerMixin, Mapping):  # pylint: disable=R0901
-    """Read-only dictionary data type"""
+class ImmutableCaseInsensitiveDict(ImmutableContainerMixin, Mapping):  # pylint: disable=R0901
+    """
+    Read-only dictionary data type with case-insensitive lookup.
+    Assumes keys are strings and can be converted to all-lowercase with .lower().
+    """
+
+    def __init__(self, container: Union[Mapping, Collection[str]]):
+        super().__init__(container)
+        self._case_insensitive_keymap = {key.lower(): key for key in self._container}
 
     @classmethod
     def mutable_type(cls) -> Type[dict]:
@@ -76,6 +84,20 @@ class ImmutableDict(ImmutableContainerMixin, Mapping):  # pylint: disable=R0901
 
     def _shallow_copy(self, obj: dict) -> dict:
         return obj.copy()
+
+    def __getitem__(self, item: str) -> Any:
+        try:
+            # Try with the given key first
+            return super().__getitem__(item)
+        except KeyError as key_not_found:
+            # Convert to lowercase and check if a case-insensitive entry exists
+            original_key = self._case_insensitive_keymap.get(item.lower())
+            # If no entry exists, reraise the KeyError containing the given name
+            if original_key is None:
+                raise key_not_found
+            # The key exists in the container, so essentially call the parent method
+            # with the original key, in order to ensure the inherited immutability as well
+            return self.__getitem__(original_key)
 
 
 class ImmutableList(ImmutableContainerMixin, Sequence):  # pylint: disable=R0901
@@ -101,7 +123,7 @@ class ImmutableList(ImmutableContainerMixin, Sequence):  # pylint: disable=R0901
 
 
 ImmutableList.register()
-ImmutableDict.register()
+ImmutableCaseInsensitiveDict.register()
 
 
 def json_encoder(obj: Any) -> Any:
