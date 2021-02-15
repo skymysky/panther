@@ -198,6 +198,8 @@ var (
 				"Standard.OneLogin.Events",
 				"Standard.AdminRoleAssigned",
 				"Standard.BruteForceByIP",
+				"panther_event_type_helpers",
+				"panther_base_helpers",
 			},
 		},
 		DisplayName:    "Panther Universal Detections",
@@ -212,6 +214,7 @@ var (
 		PackTypes: map[models.DetectionType]int{
 			models.TypeDataModel: 9,
 			models.TypeRule:      2,
+			models.TypeGlobal:    2,
 		},
 	}
 )
