@@ -505,10 +505,10 @@ type PackDefinition {
 }
 
 type PackTypes {
-  GLOBAL: Int!
-  RULE: Int!
-  DATAMODEL: Int!
-  POLICY: Int!
+  GLOBAL: Int
+  RULE: Int
+  DATAMODEL: Int
+  POLICY: Int
 }
 
 type Pack {

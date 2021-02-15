@@ -1089,10 +1089,10 @@ export type PackDefinition = {
 
 export type PackTypes = {
   __typename?: 'PackTypes';
-  GLOBAL: Scalars['Int'];
-  RULE: Scalars['Int'];
-  DATAMODEL: Scalars['Int'];
-  POLICY: Scalars['Int'];
+  GLOBAL?: Maybe<Scalars['Int']>;
+  RULE?: Maybe<Scalars['Int']>;
+  DATAMODEL?: Maybe<Scalars['Int']>;
+  POLICY?: Maybe<Scalars['Int']>;
 };
 
 export type PackVersion = {
@@ -3059,10 +3059,10 @@ export type PackTypesResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['PackTypes'] = ResolversParentTypes['PackTypes']
 > = {
-  GLOBAL?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  RULE?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  DATAMODEL?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  POLICY?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  GLOBAL?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  RULE?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  DATAMODEL?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  POLICY?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType>;
 };
 
