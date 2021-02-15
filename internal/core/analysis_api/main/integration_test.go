@@ -49,7 +49,7 @@ import (
 const (
 	tableName           = "panther-analysis"
 	packTableName       = "panther-analysis-packs"
-	analysesRoot        = "./test_analyses"
+	analysesRoot        = "./bulk_test_resources/test_analyses"
 	analysesZipLocation = "./bulk_upload.zip"
 
 	bulkTestDataDirPath              = "./bulk_test_resources"
@@ -129,7 +129,7 @@ var (
 		Description: "Example LogType Schema",
 		Enabled:     true,
 		ID:          "DataModelTypeAnalysis",
-		LogTypes:    []string{"Custom.Log.1"},
+		LogTypes:    []string{"Crowdstrike.DNSRequest"},
 		Mappings: []models.DataModelMapping{
 			{
 				Name: "source_ip",
@@ -142,7 +142,7 @@ var (
 		Description: "Example LogType Schema",
 		Enabled:     true,
 		ID:          "SecondDataModelTypeAnalysis",
-		LogTypes:    []string{"Custom.Log.2"},
+		LogTypes:    []string{"Crowdstrike.NetworkConnect"},
 		Mappings: []models.DataModelMapping{
 			{
 				Name: "source_ip",
@@ -155,7 +155,7 @@ var (
 		Description: "Example LogType Schema",
 		Enabled:     false,
 		ID:          "ThirdDataModelTypeAnalysis",
-		LogTypes:    []string{"Custom.Log.2"},
+		LogTypes:    []string{"Crowdstrike.NetworkConnect"},
 		Mappings: []models.DataModelMapping{
 			{
 				Name: "source_ip",
@@ -1321,7 +1321,7 @@ func createDataModel(t *testing.T) {
 			Description: "Example LogType Schema",
 			Enabled:     true,
 			ID:          "AnotherDataModelTypeAnalysis",
-			LogTypes:    []string{"Custom.Log.1"},
+			LogTypes:    []string{"Crowdstrike.DNSRequest"},
 			Mappings:    []models.DataModelMapping{},
 		},
 	}
@@ -2992,6 +2992,27 @@ func pollPacks(t *testing.T) {
 		Packs: []models.Pack{
 			*packOriginalReleaseStandardSet,
 			*packOriginalRelease,
+		},
+	}
+	assert.Equal(t, expected, result)
+	assert.NoError(t, err)
+	// test name contains filter
+	input = models.LambdaInput{
+		ListPacks: &models.ListPacksInput{
+			NameContains: "standard",
+		},
+	}
+	statusCode, err = apiClient.Invoke(&input, &result)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, statusCode)
+	expected = models.ListPacksOutput{
+		Paging: models.Paging{
+			ThisPage:   1,
+			TotalItems: 1,
+			TotalPages: 1,
+		},
+		Packs: []models.Pack{
+			*packOriginalReleaseStandardSet,
 		},
 	}
 	assert.Equal(t, expected, result)
