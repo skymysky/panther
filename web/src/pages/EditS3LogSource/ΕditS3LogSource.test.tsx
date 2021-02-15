@@ -97,12 +97,12 @@ describe('EditS3LogSource', () => {
       }),
     ];
     const { getByText, getByLabelText, getByAltText, findByText, queryByText } = render(
-      <Route path={urls.logAnalysis.sources.edit(':id', ':type')}>
+      <Route path={urls.integrations.logSources.edit(':id', ':type')}>
         <EditS3LogSource />
       </Route>,
       {
         mocks,
-        initialRoute: urls.logAnalysis.sources.edit(logSource.integrationId, 's3'),
+        initialRoute: urls.integrations.logSources.edit(logSource.integrationId, 's3'),
       }
     );
 
@@ -204,12 +204,12 @@ describe('EditS3LogSource', () => {
       getAllByLabelText,
       queryByText,
     } = render(
-      <Route path={urls.logAnalysis.sources.edit(':id', ':type')}>
+      <Route path={urls.integrations.logSources.edit(':id', ':type')}>
         <EditS3LogSource />
       </Route>,
       {
         mocks,
-        initialRoute: urls.logAnalysis.sources.edit(logSource.integrationId, 's3'),
+        initialRoute: urls.integrations.logSources.edit(logSource.integrationId, 's3'),
       }
     );
 
@@ -300,12 +300,12 @@ describe('EditS3LogSource', () => {
       getByAriaLabel,
       queryByText,
     } = render(
-      <Route path={urls.logAnalysis.sources.edit(':id', ':type')}>
+      <Route path={urls.integrations.logSources.edit(':id', ':type')}>
         <EditS3LogSource />
       </Route>,
       {
         mocks,
-        initialRoute: urls.logAnalysis.sources.edit(logSource.integrationId, 's3'),
+        initialRoute: urls.integrations.logSources.edit(logSource.integrationId, 's3'),
       }
     );
 
@@ -392,12 +392,12 @@ describe('EditS3LogSource', () => {
       }),
     ];
     const { getByText, getByLabelText, getByAltText, findByText } = render(
-      <Route path={urls.logAnalysis.sources.edit(':id', ':type')}>
+      <Route path={urls.integrations.logSources.edit(':id', ':type')}>
         <EditS3LogSource />
       </Route>,
       {
         mocks,
-        initialRoute: urls.logAnalysis.sources.edit(logSource.integrationId, 's3'),
+        initialRoute: urls.integrations.logSources.edit(logSource.integrationId, 's3'),
       }
     );
 
