@@ -90,12 +90,9 @@ type Query {
 }
 
 input ListPacksInput {
-  ids: [ID!]
-  exclusiveStartKey: String
-  contains: String
-  createdBefore: AWSDateTime
-  createdAfter: AWSDateTime
-  userId: ID
+  enabled: Boolean
+  updateAvailable: Boolean
+  nameContains: String
   sortDir: SortDirEnum # defaults to `ascending`
   # Paging
   pageSize: Int # defaults to `25`

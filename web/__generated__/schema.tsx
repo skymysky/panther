@@ -719,12 +719,9 @@ export type ListGlobalPythonModulesResponse = {
 };
 
 export type ListPacksInput = {
-  ids?: Maybe<Array<Scalars['ID']>>;
-  exclusiveStartKey?: Maybe<Scalars['String']>;
-  contains?: Maybe<Scalars['String']>;
-  createdBefore?: Maybe<Scalars['AWSDateTime']>;
-  createdAfter?: Maybe<Scalars['AWSDateTime']>;
-  userId?: Maybe<Scalars['ID']>;
+  enabled?: Maybe<Scalars['Boolean']>;
+  updateAvailable?: Maybe<Scalars['Boolean']>;
+  nameContains?: Maybe<Scalars['String']>;
   sortDir?: Maybe<SortDirEnum>;
   pageSize?: Maybe<Scalars['Int']>;
   page?: Maybe<Scalars['Int']>;

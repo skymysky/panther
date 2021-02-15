@@ -1125,13 +1125,9 @@ export const buildListGlobalPythonModulesResponse = (
 
 export const buildListPacksInput = (overrides: Partial<ListPacksInput> = {}): ListPacksInput => {
   return {
-    ids: 'ids' in overrides ? overrides.ids : ['1004df7e-2f2b-4cc8-983d-51c8755448b1'],
-    exclusiveStartKey: 'exclusiveStartKey' in overrides ? overrides.exclusiveStartKey : 'approach',
-    contains: 'contains' in overrides ? overrides.contains : 'virtual',
-    createdBefore:
-      'createdBefore' in overrides ? overrides.createdBefore : '2020-12-18T06:01:14.683Z',
-    createdAfter: 'createdAfter' in overrides ? overrides.createdAfter : '2020-09-06T06:26:32.447Z',
-    userId: 'userId' in overrides ? overrides.userId : 'babecc5a-ee30-4e0c-98c0-f755157ad03e',
+    enabled: 'enabled' in overrides ? overrides.enabled : false,
+    updateAvailable: 'updateAvailable' in overrides ? overrides.updateAvailable : true,
+    nameContains: 'nameContains' in overrides ? overrides.nameContains : 'exploit',
     sortDir: 'sortDir' in overrides ? overrides.sortDir : SortDirEnum.Ascending,
     pageSize: 'pageSize' in overrides ? overrides.pageSize : 303,
     page: 'page' in overrides ? overrides.page : 639,
